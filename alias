@@ -10,6 +10,7 @@ alias mv='mv -iv'
 alias vim='nvim'
 alias cal='gcal --starting-day=1'
 alias weather='curl v2.wttr.in'
+alias ncu='npx ncu -i --format group'
 
 auto-ls-ll() {
     ll
