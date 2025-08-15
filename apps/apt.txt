@@ -2,7 +2,7 @@ neovim
 zsh
 htop
 cmatrix
-neofetch
+fastfetch
 gnome-disk-utility
 fonts-inter
 fonts-roboto
