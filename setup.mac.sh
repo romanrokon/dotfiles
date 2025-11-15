@@ -27,6 +27,9 @@ echo "source "$HOME/.dotfiles/.zshrc"" >> ~/.zshrc
 mkdir ~/.config/nvim
 echo "source ~/.dotfiles/nvim/init.vim" > ~/.config/nvim/init.vim
 
+mkdir ~/.config/husky
+echo "source ~/.dotfiles/husky/init.sh" > ~/.config/husky/init.sh
+
 # brew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
