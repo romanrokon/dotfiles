@@ -707,6 +707,8 @@
 			<string>xterm-256color</string>
 			<key>Thin Strokes</key>
 			<integer>3</integer>
+			<key>Timestamps Style</key>
+			<integer>1</integer>
 			<key>Title Components</key>
 			<integer>512</integer>
 			<key>Transparency</key>
@@ -1381,6 +1383,8 @@
 			<string>xterm-256color</string>
 			<key>Thin Strokes</key>
 			<integer>3</integer>
+			<key>Timestamps Style</key>
+			<integer>2</integer>
 			<key>Title Components</key>
 			<integer>512</integer>
 			<key>Transparency</key>
