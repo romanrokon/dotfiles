@@ -57,9 +57,9 @@ PROFILE=/dev/null bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm
 nvm install --lts
 corepack enable
 corepack prepare yarn@stable --activate
+corepack prepare pnpm@stable --activate
 
-#What?
-#yarn global add neovim
+pnpm setup
 
 # iterm settings
 defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "$HOME/.dotfiles/.config"

@@ -105,7 +105,7 @@ load-nvmrc() {
 }
 
 add-zsh-hook chpwd load-nvmrc
-load-nvmrc
+#load-nvmrc
 # nvm auto use
 
 # alias must at the end, to make sure they're not overridden by anyone else, I'm talking about plugins of course
