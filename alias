@@ -14,6 +14,7 @@ alias weather='curl v2.wttr.in'
 # alias ncu='npx ncu -i --format group'
 alias ncu='npx npm-check -u --format group'
 alias tgpt="terminalgpt"
+alias npm=pnpm
 
 auto-ls-ll() {
     ll
