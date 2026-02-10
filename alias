@@ -16,6 +16,8 @@ alias ncu='npx npm-check -u --format group'
 alias tgpt="terminalgpt"
 alias npm=pnpm
 
+alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
+
 auto-ls-ll() {
     ll
 }
