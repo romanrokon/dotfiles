@@ -61,6 +61,13 @@ corepack prepare pnpm@stable --activate
 
 pnpm setup
 
+# NPM Supply chain attack prevention
+# Completely block any package from automatically running code upon installation
+pnpm config set ignore-scripts true
+npm config set ignore-scripts true
+
+# If you disable scripts globally, those packages will break. You will need to manually run pnpm rebuild <package-name>
+
 # iterm settings
 defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "$HOME/.dotfiles/.config"
 defaults write com.googlecode.iterm2.plist LoadPrefsFromCustomFolder -bool true
