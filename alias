@@ -1,5 +1,8 @@
 alias cd='z'
 alias pro='cd /Volumes/Work/projects'
+alias tree='eza --tree'
+alias find='fd --'
+alias grep='rg'
 alias ls='eza --icons --group-directories-first'
 alias ll='ls -lh --octal-permissions --git'
 alias la='ll -a'
@@ -35,3 +38,7 @@ code() {
 arc() {
   open -a "Arc" "$@"
 }
+
+alias cc=claude
+alias claude-work="CLAUDE_CONFIG_DIR=~/.claude-work claude"
+alias ccw=claude-work
