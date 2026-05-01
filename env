@@ -2,8 +2,11 @@ export PATH="$PATH:$HOME/.local/bin"
 export PATH="$PATH:$HOME/bin/**/bin"
 export PATH="$PATH:$HOME/.bin/**/bin"
 
-export ANDROID_HOME=/Users/$USER/Library/Android/sdk
-export JAVA_HOME=$ANDROID_HOME/cmdline-tools/latest/bin
+#export ANDROID_HOME=/Users/$USER/Library/Android/sdk
+#export JAVA_HOME=$ANDROID_HOME/cmdline-tools/latest/bin
+
+export ANDROID_HOME=/Users/$USER/.bubblewrap/android_sdk
+export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
 export PATH=$PATH:$ANDROID_HOME/emulator
 export PATH=$PATH:$ANDROID_HOME/tools
 export PATH=$PATH:$ANDROID_HOME/tools/bin
@@ -17,4 +20,4 @@ export PATH=/opt/local/bin:/opt/local/sbin:$PATH
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 
-. "/Users/rzman/.deno/env"
+. "/Users/$USER/.deno/env"
