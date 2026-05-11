@@ -31,10 +31,6 @@ auto-ls-git() {
 
 AUTO_LS_COMMANDS=(ll git)
 
-code() {
-  open -a "Visual Studio Code" "$@"
-}
-
 arc() {
   open -a "Arc" "$@"
 }
