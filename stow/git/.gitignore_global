@@ -1,0 +1,4 @@
+NOGIT/
+docker-compose.override.yml
+Makefile.local
+Dockerfile.local
