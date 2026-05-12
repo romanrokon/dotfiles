@@ -57,8 +57,6 @@ load-nvmrc() {
     # Force load NVM if we find an .nvmrc and it's currently lazy-loaded
     if [ "$(whence -w nvm)" = "nvm: function" ]; then
         # Check if it's our lazy-load wrapper by seeing if it's already "real"
-        # Since we use 'unset -f', once loaded it becomes a different function or command.
-        # But a safer way is to just check if the real script was sourced.
         if ! [ -n "$NVM_BIN" ]; then
              unset -f nvm node npm pnpm yarn
              [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -82,3 +80,24 @@ load-nvmrc() {
 add-zsh-hook chpwd load-nvmrc
 # Run once on startup in case we start in a directory with .nvmrc
 load-nvmrc
+
+# @ AI Context: Gemini Chat Workspace Command
+# Usage: pa | ga | gemini-chat
+# Sets up a workspace and starts Gemini.
+# Default is ephemeral (incognito). To persist, use --session <name>.
+gemini-chat() {
+    local workspace="$HOME/.gemini-chat"
+    mkdir -p "$workspace"
+    
+    cd "$workspace" || return
+
+    # If user didn't specify a session, add --ephemeral by default
+    if [[ "$*" != *"--session"* ]] && [[ "$*" != *"-s "* ]]; then
+        gemini --ephemeral "$@"
+    else
+        gemini "$@"
+    fi
+}
+
+alias pa='gemini-chat'
+alias ga='gemini-chat'
