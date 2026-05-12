@@ -1,76 +1,48 @@
- Disable accented keys popup
+#!/bin/bash
+# @ AI Context: Modernized macOS setup script using GNU Stow.
+# This script is idempotent and uses symlinking for all components.
+
+# Check for Homebrew
+if ! command -v brew &> /dev/null; then
+    echo "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+# Install GNU Stow if missing
+command -v stow &> /dev/null || brew install stow
+
+# Disable accented keys popup
 defaults write -g ApplePressAndHoldEnabled -bool false
 # Make dock appear faster
 defaults write com.apple.dock autohide-delay -float 0.1; defaults write com.apple.dock autohide-time-modifier -float 0.3; killall Dock
 # Make hidden apps easier to identify in the dock
 defaults write com.apple.Dock showhidden -bool TRUE && killall Dock
-# Change screenshot file type
-#defaults write com.apple.screencapture type jpg
 
-# zsh setup
-./z.sh
+# @ AI Context: Stow symlinking for all packages
+echo "Applying dotfiles via Stow..."
+cd "$HOME/.dotfiles" || exit
 
-# Copy & source configs in place
-alias cp="cp -v"
-#cp -r ./.config/smplayer ~/.config/smplayer
-cp ./.gitconfig ~/.gitconfig
-cp ./.vimrc ~/.vimrc
-cp ./.yarnrc.yml ~/.yarnrc.yml
-cp ./.p10k.zsh ~/.p10k.zsh
+# List of packages to stow
+PACKAGES=(zsh vim nvim git husky iterm2 ssh bin config claude)
 
-cat ./.profile >> ~/.zprofile
-echo 'source "$HOME/.dotfiles/env.mac"' >> ~/.zprofile
-# cat ./.profile >> ~/.zshenv
+# Ensure target directories exist to prevent Stow from symlinking the parent directory
+mkdir -p "$HOME/.ssh" "$HOME/.config" "$HOME/.bin" "$HOME/.claude"
 
-echo "source "$HOME/.dotfiles/.zshrc"" >> ~/.zshrc
-
-mkdir ~/.config/nvim
-echo "source ~/.dotfiles/nvim/init.vim" > ~/.config/nvim/init.vim
-
-mkdir ~/.config/husky
-echo "source ~/.dotfiles/husky/init.sh" > ~/.config/husky/init.sh
-
-# brew
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-source ~/.zprofile
-
-# Install neovim from source
-brew install --HEAD neovim
-
-# Install all apps and packages
-xargs --verbose --arg-file apps/brew.txt brew install -y &
-xargs --verbose --arg-file apps/port.txt sudo port install -y &
-
-# brew install macfuse
-# download exa from github and place it in .bin/
-
-jobs
-
-qlmanage -r
-sudo brew services start asimov
-#brew services restart mysql
-
-# Install NodeJS with nvm
-PROFILE=/dev/null bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash'
-
-nvm install --lts
-corepack enable
-corepack prepare yarn@stable --activate
-corepack prepare pnpm@stable --activate
-
-pnpm setup
-
-# NPM Supply chain attack prevention
-# Completely block any package from automatically running code upon installation
-pnpm config set ignore-scripts true
-npm config set ignore-scripts true
-
-# If you disable scripts globally, those packages will break. You will need to manually run pnpm rebuild <package-name>
+stow -d stow -t "$HOME" "${PACKAGES[@]}"
 
 # iterm settings
-defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "$HOME/.dotfiles/.config"
+defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "$HOME/.config/iterm2"
 defaults write com.googlecode.iterm2.plist LoadPrefsFromCustomFolder -bool true
 
-# login with new .zprofile
-exec zsh --login
+# Install dependencies from apps lists
+echo "Installing apps..."
+xargs brew install < apps/brew.txt
+
+# Setup NVM
+if [ ! -d "$HOME/.nvm" ]; then
+    echo "Installing NVM..."
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+fi
+
+# Finalizing
+echo "Setup complete. Please restart your terminal."

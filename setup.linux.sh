@@ -1,80 +1,45 @@
-# Copy & source configs in place
-alias cp="cp -v"
-cp -r ./.config/** ~/.config
-cp ./.gitconfig ~/.gitconfig
-cp ./.vimrc ~/.vimrc
-cp ./.yarnrc.yml ~/.yarnrc.yml
-cp ./.p10k.zsh ~/.p10k.zsh
-cp ./.zshrc ~/.zshrc
-cat ./.profile >> ~/.profile
-cat ./.profile >> ~/.zprofile
-cat ./.profile >> ~/.zshenv
+#!/bin/bash
+# @ AI Context: Modernized Linux setup script using GNU Stow.
+# This script uses the new modular structure and symlinking.
 
-mkdir ~/.config/nvim
-echo "source ~/.dotfiles/nvim/init.vim" > ~/.config/nvim/init.vim
+# Required packages to continue
+sudo apt update
+sudo apt install -y zsh curl wget unzip stow build-essential python3-pip
+
+# @ AI Context: Stow symlinking
+echo "Applying dotfiles via Stow..."
+cd "$HOME/.dotfiles" || exit
+
+# Ensure target directories exist
+mkdir -p "$HOME/.ssh" "$HOME/.config" "$HOME/.bin" "$HOME/.claude"
+
+# List of packages to stow (Linux specific adjustments can be made here)
+PACKAGES=(zsh vim nvim git husky ssh bin config claude)
+
+stow -d stow -t "$HOME" "${PACKAGES[@]}"
 
 # System tweaks
 echo "vm.swappiness=10" | sudo tee -a /etc/sysctl.conf
 sudo sed -i "s/NoDisplay=true/NoDisplay=false/g" /etc/xdg/autostart/*.desktop
 
-# Disable tracker miner fs
-sudo systemctl mask tracker-store.service tracker-miner-fs.service tracker-miner-rss.service tracker-extract.service tracker-miner-apps.service tracker-writeback.service
-
-# Check apt mirror server location before installing anything
-sudo software-properties-gtk || exit
-software-properties-gtk
-
-# Required packages to continue below, in case the os doesn't have them already
-sudo apt install zsh curl wget unzip xargs build-essential python3-pip
-
-# Install NodeJS with fnm
-# curl -fsSL https://fnm.vercel.app/install | bash
-# fnm completions --shell zsh
-# fnm install
-# fnm use
+# Disable tracker miner fs (if applicable)
+sudo systemctl mask tracker-store.service tracker-miner-fs.service tracker-miner-rss.service tracker-extract.service tracker-miner-apps.service tracker-writeback.service 2>/dev/null
 
 # Install NodeJS with nvm
-PROFILE=/dev/null bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash'
+if [ ! -d "$HOME/.nvm" ]; then
+    PROFILE=/dev/null bash -c 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash'
+fi
 
-nvm install --lts
-corepack enable
-corepack prepare yarn@stable --activate
+# Better cd (zoxide)
+command -v zoxide &> /dev/null || curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
 
-yarn global add neovim
+# Repositories for Neovim etc.
+sudo add-apt-repository ppa:neovim-ppa/stable -y
+sudo add-apt-repository ppa:appimagelauncher-team/stable -y
 
-# Install lastversion with python3-pip
-pip install lastversion
+# Install all apps from list
+xargs --arg-file apps/apt.txt sudo apt install -y
 
-# Download exa with lastversion
-mkdir ~/bin
-cd ~/bin || exit
-lastversion -v --assets --exclude musl --filter "linux-$(uname -m)-v" download https://github.com/ogham/exa
-unzip ./exa*.zip -d exa
-unalias cp
-sudo cp ~/bin/exa/completions/exa.zsh /usr/local/share/zsh/site-functions/exa.zsh
-rm -rfv ./*.zip
-
-# stretchly deb
-lastversion -v --assets --filter "amd64.deb$" download  https://github.com/hovancik/stretchly/releases
-sudo dpkg -i ./Stretchly*.deb &
-
-# Install all apps and packages
-
-./z.sh
-
-# better cd
-curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | bash
-
-add-apt-repository ppa:neovim-ppa/stable -y
-add-apt-repository ppa:appimagelauncher-team/stable
-add-apt-repository -y ppa:team-xbmc/ppa -y
-
-wget -qO- 'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x6888550b2fc77d09' | sudo tee /etc/apt/trusted.gpg.d/songrec.asc
-sudo apt-add-repository ppa:marin-m/songrec -y -u
-
-xargs --verbose --arg-file apps/apt.txt apt install -y &
-apps/snap.txt # Installs all snaps in parallel
-jobs
-
-# login with new .bash_profile
-exec zsh --login & exec bash --login
+# Finalizing
+echo "Setup complete. Switching to zsh..."
+exec zsh --login
