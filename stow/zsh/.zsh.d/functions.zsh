@@ -84,19 +84,13 @@ load-nvmrc
 # @ AI Context: Gemini Chat Workspace Command
 # Usage: pa | ga | gemini-chat
 # Sets up a workspace and starts Gemini.
-# Default is ephemeral (incognito). To persist, use --session <name>.
 gemini-chat() {
     local workspace="$HOME/.gemini-chat"
     mkdir -p "$workspace"
     
     cd "$workspace" || return
 
-    # If user didn't specify a session, add --ephemeral by default
-    if [[ "$*" != *"--session"* ]] && [[ "$*" != *"-s "* ]]; then
-        gemini --ephemeral "$@"
-    else
-        gemini "$@"
-    fi
+    gemini "$@"
 }
 
 alias pa='gemini-chat'
