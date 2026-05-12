@@ -1,28 +1,42 @@
-export PATH="$PATH:$HOME/.local/bin"
-export PATH="$PATH:$HOME/bin/**/bin"
-export PATH="$PATH:$HOME/.bin/**/bin"
+# @ AI Context: Modular environment variables.
+# Integrated from env and env.mac.zsh.
 
-#export ANDROID_HOME=/Users/$USER/Library/Android/sdk
-#export JAVA_HOME=$ANDROID_HOME/cmdline-tools/latest/bin
+# Path cleanup - prevent duplicates
+typeset -U path
 
-export ANDROID_HOME=/Users/$USER/.bubblewrap/android_sdk
-export JAVA_HOME=/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
-export PATH=$PATH:$ANDROID_HOME/emulator
-export PATH=$PATH:$ANDROID_HOME/tools
-export PATH=$PATH:$ANDROID_HOME/tools/bin
-export PATH=$PATH:$ANDROID_HOME/platform-tools
+# Homebrew for Mac
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+    export HOMEBREW_UPDATE_PREINSTALL=0
+fi
 
+path=(
+    "$HOME/.local/bin"
+    "$HOME/bin"
+    "/opt/local/bin"
+    "/opt/local/sbin"
+    "/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+    $path
+)
 
-#export PATH=$PATH:$HOME/.yarn/bin/yarn
+export PATH
 
-export PATH=/opt/local/bin:/opt/local/sbin:$PATH
-#eval "$(fnm env --use-on-cd)"
+# Android & Java
+export ANDROID_HOME="$HOME/.bubblewrap/android_sdk"
+export JAVA_HOME="/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
+
+path=(
+    "$ANDROID_HOME/emulator"
+    "$ANDROID_HOME/tools"
+    "$ANDROID_HOME/tools/bin"
+    "$ANDROID_HOME/platform-tools"
+    $path
+)
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 
-. "/Users/$USER/.deno/env"
-
-
-# Add Visual Studio Code CLI (code)
-export PATH="$PATH:/Applications/Visual Studio Code.app/Contents/Resources/app/bin"
+# Deno
+[ -f "$HOME/.deno/env" ] && . "$HOME/.deno/env"
+if [[ ":$FPATH:" != *":/Users/rzman/.zsh/completions:"* ]]; then 
+    export FPATH="/Users/rzman/.zsh/completions:$FPATH"
+fi
