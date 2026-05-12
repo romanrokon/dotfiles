@@ -90,7 +90,7 @@ gemini-chat() {
     
     cd "$workspace" || return
 
-    gemini "$@"
+    gemini --skip-trust "$@"
 }
 
 alias pa='gemini-chat'
