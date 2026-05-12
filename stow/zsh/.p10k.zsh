@@ -75,7 +75,6 @@
     timewarrior             # timewarrior tracking status (https://timewarrior.net/)
     taskwarrior             # taskwarrior task count (https://taskwarrior.org/)
     # cpu_arch              # CPU architecture
-    # time                  # current time
     #
     # =========================[ Line #2 ]=========================
     newline                 # \n
@@ -99,6 +98,7 @@
     # proxy                 # system-wide http/https/ftp proxy
     # battery               # internal battery
     wifi                  # wifi speed
+    time                  # current time
     # example               # example user-defined segment (see prompt_example function below)
   )
 
