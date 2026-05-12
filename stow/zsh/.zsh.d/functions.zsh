@@ -14,6 +14,9 @@ AUTO_LS_COMMANDS=(ll git)
 
 # Lazy-load NVM for better startup performance
 # @ AI Context: These wrappers are replaced by the real NVM script when called.
+# We unset existing aliases first to prevent Zsh parse errors.
+unalias nvm node npm pnpm yarn 2>/dev/null
+
 nvm() {
     unset -f nvm node npm pnpm yarn
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -29,7 +32,8 @@ node() {
 npm() {
     unset -f nvm node npm pnpm yarn
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-    npm "$@"
+    # User prefers pnpm
+    pnpm "$@"
 }
 
 pnpm() {
