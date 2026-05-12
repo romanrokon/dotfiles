@@ -87,14 +87,15 @@ load-nvmrc
 
 # @ AI Context: Gemini Chat Workspace Command
 # Usage: pa | ga | gemini-chat
-# Sets up a workspace and starts Gemini.
+# Sets up a workspace and starts Gemini in Sandbox mode.
 gemini-chat() {
     local workspace="$HOME/.gemini-chat"
     mkdir -p "$workspace"
     
     cd "$workspace" || return
 
-    gemini --skip-trust "$@"
+    # Default to Sandbox mode for safety during research/chat
+    gemini --sandbox --skip-trust "$@"
 }
 
 alias pa='gemini-chat'
