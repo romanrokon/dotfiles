@@ -1,22 +1,16 @@
 #!/bin/bash
 # @ AI Context: Modernized Linux setup script using GNU Stow.
-# This script uses the new modular structure and symlinking.
+# This script uses dynamic package detection and symlinking.
 
 # Required packages to continue
 sudo apt update
 sudo apt install -y zsh curl wget unzip stow build-essential python3-pip
 
-# @ AI Context: Stow symlinking
-echo "Applying dotfiles via Stow..."
+# @ AI Context: Dynamic Stow symlinking
+echo "Applying dotfiles..."
 cd "$HOME/.dotfiles" || exit
-
-# Ensure target directories exist
-mkdir -p "$HOME/.ssh" "$HOME/.config" "$HOME/.bin" "$HOME/.claude"
-
-# List of packages to stow (Linux specific adjustments can be made here)
-PACKAGES=(zsh vim nvim git husky ssh bin config claude)
-
-stow -d stow -t "$HOME" "${PACKAGES[@]}"
+chmod +x stow-all.sh
+./stow-all.sh
 
 # System tweaks
 echo "vm.swappiness=10" | sudo tee -a /etc/sysctl.conf

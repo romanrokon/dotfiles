@@ -1,6 +1,6 @@
 #!/bin/bash
 # @ AI Context: Modernized macOS setup script using GNU Stow.
-# This script is idempotent and uses symlinking for all components.
+# This script is idempotent and uses dynamic symlinking for all components.
 
 # Check for Homebrew
 if ! command -v brew &> /dev/null; then
@@ -18,17 +18,10 @@ defaults write com.apple.dock autohide-delay -float 0.1; defaults write com.appl
 # Make hidden apps easier to identify in the dock
 defaults write com.apple.Dock showhidden -bool TRUE && killall Dock
 
-# @ AI Context: Stow symlinking for all packages
-echo "Applying dotfiles via Stow..."
+# @ AI Context: Dynamic Stow symlinking
+echo "Applying dotfiles..."
 cd "$HOME/.dotfiles" || exit
-
-# List of packages to stow
-PACKAGES=(zsh vim nvim git husky iterm2 ssh bin config claude)
-
-# Ensure target directories exist to prevent Stow from symlinking the parent directory
-mkdir -p "$HOME/.ssh" "$HOME/.config" "$HOME/.bin" "$HOME/.claude"
-
-stow -d stow -t "$HOME" "${PACKAGES[@]}"
+./stow-all.sh
 
 # iterm settings
 defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "$HOME/.config/iterm2"
