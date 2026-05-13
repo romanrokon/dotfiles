@@ -1,0 +1,197 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__next-devtools__browser_eval",
+      "Bash(curl -s)",
+      "Bash(grep -l)",
+      "Bash(pnpm ls:*)",
+      "Bash(npm ls:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm biome:*)",
+      "Bash(pnpm format:*)",
+      "Bash(pnpm build:*)",
+      "Bash(ls)",
+      "Bash(tree)",
+      "Read(//Users/rzman/.claude/**)",
+      "WebSearch",
+      "Bash(gh pr *)",
+      "mcp__plugin_figma_figma__get_figjam",
+      "mcp__plugin_figma_figma__use_figma",
+      "mcp__plugin_figma_figma__get_screenshot",
+      "mcp__plugin_figma_figma__whoami",
+      "mcp__plugin_figma_figma__create_new_file",
+      "mcp__plugin_figma_figma__get_metadata",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "Bash(pnpm:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(pnpm start:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm test:e2e:*)",
+      "Bash(pnpm clean:*)",
+      "Bash(pnpm exec:*)",
+      "Bash(pnpm exec tsc:*)",
+      "Bash(pnpm exec oxlint:*)",
+      "Bash(pnpm exec oxfmt:*)",
+      "Bash(pnpm exec jest:*)",
+      "Bash(pnpm exec playwright:*)",
+      "Bash(pnpm exec next:*)",
+      "Bash(npx:*)",
+      "Bash(node:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git status:*)",
+      "Bash(git fetch:*)",
+      "Bash(git branch:*)",
+      "Bash(git show:*)",
+      "Bash(git checkout -b:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(xargs:*)",
+      "Bash(source:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_context7_context7__query-docs",
+      "mcp__plugin_linear_linear__get_issue",
+      "mcp__plugin_linear_linear__list_issues",
+      "mcp__plugin_linear_linear__list_comments",
+      "mcp__plugin_linear_linear__get_team",
+      "mcp__plugin_linear_linear__list_teams",
+      "mcp__plugin_linear_linear__get_user",
+      "mcp__plugin_linear_linear__list_users",
+      "mcp__plugin_linear_linear__get_project",
+      "mcp__plugin_linear_linear__list_projects",
+      "mcp__plugin_linear_linear__list_issue_labels",
+      "mcp__plugin_linear_linear__list_issue_statuses",
+      "mcp__plugin_linear_linear__get_issue_status",
+      "mcp__plugin_linear_linear__search_documentation",
+      "mcp__sentry__find_organizations",
+      "mcp__sentry__find_projects",
+      "mcp__sentry__search_issues",
+      "mcp__sentry__search_events",
+      "mcp__sentry__get_sentry_resource",
+      "mcp__sentry__search_docs",
+      "mcp__sentry__whoami",
+      "mcp__vercel__authenticate",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_network_requests",
+      "mcp__next-devtools__nextjs_docs",
+      "mcp__next-devtools__nextjs_index"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean -f:*)"
+    ],
+    "defaultMode": "acceptEdits"
+  },
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"continue\": false, \"stopReason\": \"Auto-compact is disabled\"}'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); tp=$(printf '%s' \"$input\" | jq -r '.transcript_path // empty' 2>/dev/null); [ -z \"$tp\" ] && exit 0; tail -5 \"$tp\" | grep -qiE '(usage.limit|rate.limit|resets.at|quota.exceed|too.many.request)' 2>/dev/null || exit 0; printf '%s' \"$input\" | python3 ~/.claude/hooks/rate_limit_resume.py"
+          },
+          {
+            "type": "command",
+            "command": "jq -r '.last_assistant_message // empty' | perl -0777 -pe 's/```.*?```//gs' | say; terminal-notifier -remove claude-pause 2>/dev/null || true",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); msg=$(echo \"$input\" | jq -r '.message // empty'); ws=$(echo \"$input\" | jq -r '.cwd // empty' | xargs -I{} basename {}); [ -n \"$msg\" ] && { afplay /System/Library/Sounds/Glass.aiff & say \"$ws: $msg\" & terminal-notifier -title \"Claude — $ws\" -message \"$msg\" -group claude-pause -ignoreDoNotDisturb; } 2>/dev/null || true",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "terminal-notifier -remove claude-pause 2>/dev/null || true",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "terminal-notifier -remove claude-pause 2>/dev/null || true",
+            "async": true
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/plugins/data/caveman-caveman/caveman-statusline.sh"
+  },
+  "enabledPlugins": {
+    "context7@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "figma@claude-plugins-official": false,
+    "frontend-design@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "caveman@caveman": true,
+    "chrome-devtools-mcp@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
+    },
+    "chrome-devtools-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "ChromeDevTools/chrome-devtools-mcp"
+      }
+    }
+  },
+  "effortLevel": "low",
+  "voice": {
+    "enabled": false,
+    "mode": "hold"
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "editorMode": "vim",
+  "preferredNotifChannel": "auto",
+  "autoCompactEnabled": true,
+  "remoteControlAtStartup": true,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
+  "voiceEnabled": false
+}

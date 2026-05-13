@@ -1,0 +1,131 @@
+{
+  "version": 2,
+  "plugins": {
+    "context7@claude-plugins-official": [
+      {
+        "scope": "project",
+        "projectPath": "/Volumes/Work/projects/freelance/revnest/frontend.worktrees/wizardry",
+        "installPath": "/Users/rzman/.claude/plugins/cache/claude-plugins-official/context7/unknown",
+        "version": "unknown",
+        "installedAt": "2026-04-01T16:49:18.985Z",
+        "lastUpdated": "2026-05-06T07:11:46.563Z"
+      }
+    ],
+    "code-simplifier@claude-plugins-official": [
+      {
+        "scope": "project",
+        "projectPath": "/Volumes/Work/projects/freelance/revnest/frontend.worktrees/wizardry",
+        "installPath": "/Users/rzman/.claude/plugins/cache/claude-plugins-official/code-simplifier/1.0.0",
+        "version": "1.0.0",
+        "installedAt": "2026-04-01T16:49:29.996Z",
+        "lastUpdated": "2026-05-06T07:11:46.563Z"
+      }
+    ],
+    "figma@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/rzman/.claude/plugins/cache/claude-plugins-official/figma/2.1.30",
+        "version": "2.1.30",
+        "installedAt": "2026-04-01T16:50:39.264Z",
+        "lastUpdated": "2026-04-29T04:10:16.797Z",
+        "gitCommitSha": "500e8738438ed1204eaf23e61280d872f47534fd"
+      }
+    ],
+    "frontend-design@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/rzman/.claude/plugins/cache/claude-plugins-official/frontend-design/unknown",
+        "version": "unknown",
+        "installedAt": "2026-04-01T16:51:28.201Z",
+        "lastUpdated": "2026-04-01T16:51:28.201Z"
+      }
+    ],
+    "feature-dev@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/rzman/.claude/plugins/cache/claude-plugins-official/feature-dev/unknown",
+        "version": "unknown",
+        "installedAt": "2026-04-02T07:19:06.780Z",
+        "lastUpdated": "2026-04-02T07:19:06.780Z"
+      }
+    ],
+    "playwright@claude-plugins-official": [
+      {
+        "scope": "project",
+        "projectPath": "/Volumes/Work/projects/freelance/revnest/frontend.worktrees/wizardry",
+        "installPath": "/Users/rzman/.claude/plugins/cache/claude-plugins-official/playwright/unknown",
+        "version": "unknown",
+        "installedAt": "2026-04-02T07:19:22.810Z",
+        "lastUpdated": "2026-05-06T07:11:46.563Z"
+      }
+    ],
+    "typescript-lsp@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/rzman/.claude/plugins/cache/claude-plugins-official/typescript-lsp/1.0.0",
+        "version": "1.0.0",
+        "installedAt": "2026-04-02T07:19:33.179Z",
+        "lastUpdated": "2026-04-02T07:19:33.179Z"
+      }
+    ],
+    "security-guidance@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/rzman/.claude/plugins/cache/claude-plugins-official/security-guidance/unknown",
+        "version": "unknown",
+        "installedAt": "2026-04-02T07:20:17.834Z",
+        "lastUpdated": "2026-04-02T07:20:17.834Z"
+      }
+    ],
+    "caveman@caveman": [
+      {
+        "scope": "user",
+        "installPath": "/Users/rzman/.claude/plugins/cache/caveman/caveman/63e797cd753b",
+        "version": "63e797cd753b",
+        "installedAt": "2026-04-18T18:02:33.689Z",
+        "lastUpdated": "2026-04-18T18:02:33.689Z",
+        "gitCommitSha": "63e797cd753b301374947a5ed975c21775d962b9"
+      }
+    ],
+    "code-review@claude-plugins-official": [
+      {
+        "scope": "project",
+        "projectPath": "/Volumes/Work/projects/freelance/revnest/frontend.worktrees/wizardry",
+        "installPath": "/Users/rzman/.claude/plugins/cache/claude-plugins-official/code-review/unknown",
+        "version": "unknown",
+        "installedAt": "2026-04-22T06:42:25.049Z",
+        "lastUpdated": "2026-05-06T07:11:46.563Z"
+      }
+    ],
+    "github@claude-plugins-official": [
+      {
+        "scope": "project",
+        "projectPath": "/Volumes/Work/projects/freelance/revnest/frontend.worktrees/wizardry",
+        "installPath": "/Users/rzman/.claude/plugins/cache/claude-plugins-official/github/unknown",
+        "version": "unknown",
+        "installedAt": "2026-04-22T06:42:25.049Z",
+        "lastUpdated": "2026-05-06T07:11:46.563Z"
+      }
+    ],
+    "linear@claude-plugins-official": [
+      {
+        "scope": "project",
+        "projectPath": "/Volumes/Work/projects/freelance/revnest/frontend.worktrees/wizardry",
+        "installPath": "/Users/rzman/.claude/plugins/cache/claude-plugins-official/linear/unknown",
+        "version": "unknown",
+        "installedAt": "2026-04-22T06:42:25.049Z",
+        "lastUpdated": "2026-05-06T07:11:46.563Z"
+      }
+    ],
+    "chrome-devtools-mcp@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/rzman/.claude/plugins/cache/claude-plugins-official/chrome-devtools-mcp/0.22.0",
+        "version": "0.22.0",
+        "installedAt": "2026-05-01T17:05:47.495Z",
+        "lastUpdated": "2026-05-01T17:05:47.495Z",
+        "gitCommitSha": "a1612be8e01401cf1711c64bc2ef5da5763ba956"
+      }
+    ]
+  }
+}

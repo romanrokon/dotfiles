@@ -1,0 +1,26 @@
+{
+  "claude-plugins-official": {
+    "source": {
+      "source": "github",
+      "repo": "anthropics/claude-plugins-official"
+    },
+    "installLocation": "/Users/rzman/.claude/plugins/marketplaces/claude-plugins-official",
+    "lastUpdated": "2026-05-08T09:21:17.497Z"
+  },
+  "caveman": {
+    "source": {
+      "source": "github",
+      "repo": "JuliusBrussee/caveman"
+    },
+    "installLocation": "/Users/rzman/.claude/plugins/marketplaces/caveman",
+    "lastUpdated": "2026-04-14T16:02:32.032Z"
+  },
+  "chrome-devtools-plugins": {
+    "source": {
+      "source": "github",
+      "repo": "ChromeDevTools/chrome-devtools-mcp"
+    },
+    "installLocation": "/Users/rzman/.claude/plugins/marketplaces/chrome-devtools-plugins",
+    "lastUpdated": "2026-05-01T17:05:32.488Z"
+  }
+}
