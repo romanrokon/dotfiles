@@ -24,14 +24,13 @@ cd "$HOME/.dotfiles" || exit
 ./stow-all.sh
 
 # @ AI Context: Universal Agent Bridge
-# Links individual agent folders to the unified ~/.agents Source of Truth.
+# Links Claude to the unified ~/.agents Source of Truth.
+# Gemini and Copilot naturally respect ~/.agents/skills.
 echo "Setting up universal agent bridges..."
-mkdir -p "$HOME/.claude" "$HOME/.gemini" "$HOME/.copilot"
+mkdir -p "$HOME/.claude"
 ln -sf "$HOME/.agents/skills" "$HOME/.claude/skills"
 ln -sf "$HOME/.agents/agents" "$HOME/.claude/agents"
 ln -sf "$HOME/.agents/hooks" "$HOME/.claude/hooks"
-ln -sf "$HOME/.agents/skills" "$HOME/.gemini/skills"
-ln -sf "$HOME/.agents/skills" "$HOME/.copilot/skills"
 
 # iterm settings
 defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "$HOME/.config/iterm2"
