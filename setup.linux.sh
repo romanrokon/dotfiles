@@ -34,6 +34,14 @@ sudo add-apt-repository ppa:appimagelauncher-team/stable -y
 # Install all apps from list
 xargs --arg-file apps/apt.txt sudo apt install -y
 
+# Install Cargo apps
+if command -v cargo &> /dev/null; then
+    echo "Installing Cargo apps from cargo.txt..."
+    xargs cargo install < apps/cargo.txt
+else
+    echo "Cargo is not installed. Skipping cargo apps."
+fi
+
 # Finalizing
 echo "Setup complete. Switching to zsh..."
 exec zsh --login

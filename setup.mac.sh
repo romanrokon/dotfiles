@@ -50,5 +50,13 @@ if [ ! -d "$HOME/.nvm" ]; then
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 fi
 
+# Install Cargo apps
+if command -v cargo &> /dev/null; then
+    echo "Installing Cargo apps from cargo.txt..."
+    xargs cargo install < apps/cargo.txt
+else
+    echo "Cargo is not installed. Skipping cargo apps."
+fi
+
 # Finalizing
 echo "Setup complete. Please restart your terminal."
