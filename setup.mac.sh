@@ -23,6 +23,16 @@ echo "Applying dotfiles..."
 cd "$HOME/.dotfiles" || exit
 ./stow-all.sh
 
+# @ AI Context: Universal Agent Bridge
+# Links individual agent folders to the unified ~/.agents Source of Truth.
+echo "Setting up universal agent bridges..."
+mkdir -p "$HOME/.claude" "$HOME/.gemini" "$HOME/.copilot"
+ln -sf "$HOME/.agents/skills" "$HOME/.claude/skills"
+ln -sf "$HOME/.agents/agents" "$HOME/.claude/agents"
+ln -sf "$HOME/.agents/hooks" "$HOME/.claude/hooks"
+ln -sf "$HOME/.agents/skills" "$HOME/.gemini/skills"
+ln -sf "$HOME/.agents/skills" "$HOME/.copilot/skills"
+
 # iterm settings
 defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "$HOME/.config/iterm2"
 defaults write com.googlecode.iterm2.plist LoadPrefsFromCustomFolder -bool true
