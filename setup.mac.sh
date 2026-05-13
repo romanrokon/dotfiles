@@ -37,12 +37,11 @@ defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "$HOME/.con
 defaults write com.googlecode.iterm2.plist LoadPrefsFromCustomFolder -bool true
 
 # Install dependencies from apps lists
-echo "Installing apps..."
+echo "Installing apps from brew.txt..."
 xargs brew install < apps/brew.txt
 
-# Install Yazi and its dependencies
-echo "Installing Yazi and dependencies..."
-brew install yazi ffmpeg-full sevenzip jq poppler fd ripgrep fzf zoxide resvg imagemagick-full font-symbols-only-nerd-font
+# Specialized linking for Yazi dependencies
+echo "Linking Yazi dependencies..."
 brew link ffmpeg-full imagemagick-full -f --overwrite
 
 # Setup NVM

@@ -15,3 +15,14 @@ asimov
 time-out
 gifski
 android-file-transfer
+yazi
+ffmpeg-full
+sevenzip
+jq
+poppler
+fd
+ripgrep
+fzf
+resvg
+imagemagick-full
+font-symbols-only-nerd-font
