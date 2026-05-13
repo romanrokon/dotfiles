@@ -1,0 +1,27 @@
+#!/bin/bash
+# @ AI Context: Git wrapper script to automate .todo.md sync for worktrees.
+# This script intercepts 'git worktree add' and copies your local todos.
+
+REAL_GIT="/usr/bin/git"
+if [ ! -f "$REAL_GIT" ]; then REAL_GIT=$(which -a git | grep -v "$HOME/.bin/git" | head -n 1); fi
+
+# Handle worktree add
+if [ "$1" = "worktree" ] && [ "$2" = "add" ]; then
+    # Run the real command first
+    "$REAL_GIT" "$@"
+    EXIT_CODE=$?
+    
+    # If successful, copy .todo.md to the new worktree
+    if [ $EXIT_CODE -eq 0 ]; then
+        # The last argument is usually the path
+        NEW_WT_PATH="${@: -1}"
+        if [ -f ".todo.md" ] && [ -d "$NEW_WT_PATH" ]; then
+            echo "📝 Syncing .todo.md to new worktree..."
+            cp ".todo.md" "$NEW_WT_PATH/.todo.md"
+        fi
+    fi
+    exit $EXIT_CODE
+fi
+
+# Pass all other commands to real git
+exec "$REAL_GIT" "$@"

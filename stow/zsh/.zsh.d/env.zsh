@@ -11,6 +11,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 fi
 
 path=(
+    "$HOME/.bin"
     "$HOME/.local/bin"
     "$HOME/bin"
     "/opt/local/bin"
