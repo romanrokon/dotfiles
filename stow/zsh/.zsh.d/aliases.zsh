@@ -38,3 +38,7 @@ arc() {
 alias cc=claude
 alias claude-work="CLAUDE_CONFIG_DIR=~/.claude-work claude"
 alias ccw=claude-work
+
+# Docker & Backup
+alias make-backup="docker-compose -f docker-compose.yml -f docker-compose.arm64.yml exec -T db pg_dump -U app app > NOGIT/backups/backup_\$(date +%Y%m%d_%H%M%S).sql"
+alias make-stop="docker-compose -f docker-compose.yml -f docker-compose.arm64.yml stop"
