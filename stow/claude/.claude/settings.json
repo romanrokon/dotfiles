@@ -91,6 +91,17 @@
     "defaultMode": "acceptEdits"
   },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-dangerous-git.sh"
+          }
+        ]
+      }
+    ],
     "PreCompact": [
       {
         "matcher": "auto",
@@ -166,7 +177,8 @@
     "security-guidance@claude-plugins-official": true,
     "caveman@caveman": true,
     "chrome-devtools-mcp@claude-plugins-official": true,
-    "warp@claude-code-warp": true
+    "warp@claude-code-warp": true,
+    "linear@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "caveman": {
