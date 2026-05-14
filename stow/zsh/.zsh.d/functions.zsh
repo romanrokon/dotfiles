@@ -102,9 +102,9 @@ alias pa='gemini-chat'
 alias ga='gemini-chat'
 
 # @ AI Context: Automate worktree creation and sync globally ignored files
-mkw() {
+gw() {
     if [ -z "$1" ]; then
-        echo "Usage: mkw <name>"
+        echo "Usage: gw <name>"
         return 1
     fi
     local wt_name="$1"
@@ -131,3 +131,5 @@ mkw() {
     fi
     return $exit_code
 }
+
+alias git-worktree='gw'
