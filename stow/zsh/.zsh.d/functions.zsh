@@ -100,3 +100,34 @@ gemini-chat() {
 
 alias pa='gemini-chat'
 alias ga='gemini-chat'
+
+# @ AI Context: Automate worktree creation and sync globally ignored files
+mkw() {
+    if [ -z "$1" ]; then
+        echo "Usage: mkw <name>"
+        return 1
+    fi
+    local wt_name="$1"
+    
+    # Create the branch and worktree
+    git worktree add -b "$wt_name" "$wt_name"
+    local exit_code=$?
+    
+    if [ $exit_code -eq 0 ] && [ -f "$HOME/.gitignore_global" ]; then
+        echo "Syncing globally ignored files to the new worktree..."
+        while IFS= read -r item || [ -n "$item" ]; do
+            # Skip comments and empty lines
+            [[ -z "$item" || "$item" == \#* ]] && continue
+            
+            # Remove trailing slash to handle directories correctly with -e
+            local target="${item%/}"
+            
+            # Copy if it exists in the current repo
+            if [ -e "$target" ]; then
+                echo "  -> Copying $target"
+                cp -R "$target" "$wt_name/"
+            fi
+        done < "$HOME/.gitignore_global"
+    fi
+    return $exit_code
+}
