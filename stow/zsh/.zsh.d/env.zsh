@@ -36,6 +36,14 @@ path=(
 
 export NVM_DIR="$HOME/.nvm"
 
+# Fallback Node path for non-interactive shells (like Claude hooks)
+if [ -d "$NVM_DIR/versions/node" ]; then
+    fallback_node_bin=$(ls -td "$NVM_DIR/versions/node"/v* 2>/dev/null | head -1)/bin
+    if [ -d "$fallback_node_bin" ]; then
+        path=("$fallback_node_bin" $path)
+    fi
+fi
+
 # Deno
 [ -f "$HOME/.deno/env" ] && . "$HOME/.deno/env"
 if [[ ":$FPATH:" != *":/Users/rzman/.zsh/completions:"* ]]; then 
