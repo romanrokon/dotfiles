@@ -55,6 +55,6 @@ source ~/.oh-my-zsh/custom/plugins/auto-ls.zsh
 autoload -Uz compinit
 compinit
 
-# Initialize zoxide
+# Initialize zoxide (must be last)
+export _ZO_DOCTOR=0
 eval "$(zoxide init zsh)"
-alias lg='lazygit'

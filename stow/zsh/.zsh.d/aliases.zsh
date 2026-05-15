@@ -18,6 +18,7 @@ alias weather='curl v2.wttr.in'
 alias ncu='npx npm-check -u --format group'
 alias tgpt="terminalgpt"
 alias npm=pnpm
+alias lg='lazygit'
 
 alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
 
