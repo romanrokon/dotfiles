@@ -32,7 +32,6 @@ ln -sf "$HOME/.agents/skills" "$HOME/.claude/skills"
 ln -sf "$HOME/.agents/agents" "$HOME/.claude/agents"
 ln -sf "$HOME/.agents/hooks" "$HOME/.claude/hooks"
 ln -sf "$HOME/.agents/AGENTS.md" "$HOME/.claude/CLAUDE.md"
-ln -sf "$HOME/.agents/AGENTS.md" "$HOME/.gemini-chat/GEMINI.md"
 
 # iterm settings
 defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "$HOME/.config/iterm2"
