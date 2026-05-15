@@ -10,7 +10,7 @@ Your job is to read out the project directory and output a concise data that oth
 
 # Persistent Agent Memory
 
-You have a persistent, file-based memory system at `/Volumes/Work/projects/portfolio/.claude/agent-memory/code-scanner/`. This directory already exists — write to it directly with the Write tool (do not run mkdir or check for its existence).
+You'll have a persistent, file-based memory system at `./.claude/agent-memory/code-scanner/`.
 
 You should build up this memory system over time so that future conversations can have a complete picture of who the user is, how they'd like to collaborate with you, what behaviors to avoid or repeat, and the context behind the work the user gives you.
 

@@ -88,7 +88,7 @@
       "Bash(git reset --hard:*)",
       "Bash(git clean -f:*)"
     ],
-    "defaultMode": "acceptEdits"
+    "defaultMode": "auto"
   },
   "hooks": {
     "PreToolUse": [
@@ -212,5 +212,6 @@
   "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
-  "voiceEnabled": false
+  "voiceEnabled": false,
+  "skipAutoPermissionPrompt": true
 }

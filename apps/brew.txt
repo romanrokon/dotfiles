@@ -26,3 +26,5 @@ fzf
 resvg
 imagemagick-full
 font-symbols-only-nerd-font
+lazygit
+git-delta

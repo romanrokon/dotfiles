@@ -57,3 +57,4 @@ compinit
 
 # Initialize zoxide
 eval "$(zoxide init zsh)"
+alias lg='lazygit'
