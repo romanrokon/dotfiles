@@ -1,0 +1,39 @@
+# --- Core & Shell ---
+command = /bin/zsh
+
+# --- Scroll ---
+mouse-scroll-multiplier = 3
+
+# --- Font Settings ---
+# Extracted from: "MesloLGS-NF-Regular 16"
+font-family = "MesloLGS NF"
+font-size = 16
+font-style = Regular
+
+# --- Quake Mode (Quick Terminal) ---
+# Extracted from your HotKey profile (Key Code 38 = j, Modifier = Command)
+keybind = global:cmd+j=toggle_quick_terminal
+quick-terminal-position = top
+quick-terminal-animation-duration = 0.2
+
+# --- Window & Aesthetics ---
+# Extracted from TerminalMargin: 5
+window-padding-x = 5
+window-padding-y = 5
+
+# Extracted from Transparency: 0.30 and Blur Radius: ~30
+# Ghostty uses opacity (1 - 0.3 = 0.7) and native macOS blur
+background-opacity = 0.7
+background-blur = true
+
+# --- Colors ---
+# Extracted from your specific RGB values
+background = #000000
+foreground = #00FF00
+cursor-color = #FFFFFF
+cursor-style = block
+cursor-style-blink = true
+
+# Selection color extracted from (R: 0.70, G: 0.83, B: 1.0)
+selection-background = #b5d5ff
+selection-foreground = #000000

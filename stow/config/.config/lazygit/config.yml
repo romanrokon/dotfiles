@@ -1,0 +1,33 @@
+gui:
+  nerdFontsVersion: "3"
+  showFileTree: true
+  showIcons: true
+  scrollHeight: 1
+  theme:
+    activeBorderColor: [blue, bold]
+    inactiveBorderColor: [white]
+    selectedLineBgColor: ["#2d3f5f"]
+    selectedRangeBgColor: ["#2d3f5f"]
+git:
+  pagers:
+    - colorArg: always
+      pager: delta --paging=never --side-by-side --line-numbers
+  autoRefresh: true
+  autoFetch: true
+customCommands:
+  - key: "P"
+    context: "global"
+    command: "git push"
+    prompts:
+      - type: "confirm"
+        title: "Push?"
+        body: "Push current branch to its upstream?"
+    loadingText: "Pushing..."
+  - key: "p"
+    context: "global"
+    command: "git pull"
+    prompts:
+      - type: "confirm"
+        title: "Pull?"
+        body: "Pull current branch from its upstream?"
+    loadingText: "Pulling..."
