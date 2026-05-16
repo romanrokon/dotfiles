@@ -154,6 +154,19 @@ if [ "$AGGRESSIVE" = 1 ]; then
   run "killall Spotify"
   run "killall Podcasts"
   run "pkill -f 'Code Helper'"
+
+  # Dev servers — often forgotten in background, heavy CPU
+  run "pkill -f 'next dev'"
+  run "pkill -f 'next start'"
+  run "pkill -f 'next build'"
+  run "pkill -f 'next-server'"
+  run "pkill -f 'vite'"
+  run "pkill -f 'webpack'"
+  run "pkill -f 'turbopack'"
+  run "pkill -f 'nodemon'"
+  run "pkill -f 'esbuild'"
+  run "pkill -f 'tsc --watch'"
+  run "pkill -f 'tsserver'"             # VSCode TS language server
 fi
 
 section "🧹 Purging inactive RAM"
