@@ -141,6 +141,11 @@ run "sudo killall corespotlightd"             # CoreSpotlight
 # UI leaks
 run "killall AltTab && open -a AltTab"
 
+# Screenshot UI — fixes stuck floating thumbnail / hung save
+run "killall screencaptureui"
+run "killall ScreenshotPicker"
+run "killall screencapture"
+
 if [ "$AGGRESSIVE" = 1 ]; then
   section "🧨 AGGRESSIVE: heavy app restarts"
   run "killall Slack"
