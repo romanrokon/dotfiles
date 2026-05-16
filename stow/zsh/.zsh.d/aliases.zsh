@@ -43,3 +43,9 @@ alias ccw=claude-work
 # Docker & Backup
 alias make-backup="docker-compose -f docker-compose.yml -f docker-compose.arm64.yml exec -T db pg_dump -U app app > NOGIT/backups/backup_\$(date +%Y%m%d_%H%M%S).sql"
 alias make-stop="docker-compose -f docker-compose.yml -f docker-compose.arm64.yml stop"
+
+# Mac thermal utils (canonical in stow/bin/.bin/, symlinked to ~/.bin/)
+alias cool='cooldown'
+alias coola='cooldown --aggressive'
+alias coold='cooldown --dry-run'
+alias heat='heatlog'

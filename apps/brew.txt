@@ -28,3 +28,7 @@ imagemagick-full
 font-symbols-only-nerd-font
 lazygit
 git-delta
+gum
+lolcat
+figlet
+orbstack

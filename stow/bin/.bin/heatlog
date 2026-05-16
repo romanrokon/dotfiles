@@ -1,0 +1,83 @@
+#!/bin/bash
+# Log temp + mem pressure, notify on threshold breach.
+# Usage: ./heatlog.sh [interval_seconds] [temp_threshold_C] [swap_threshold_GB]
+# Stop: Ctrl+C
+
+INTERVAL=${1:-30}
+TEMP_MAX=${2:-90}
+SWAP_MAX=${3:-5}
+
+LOG="$(dirname "$0")/heatlog.csv"
+ALERT_COOLDOWN=300  # 5min between same-type alerts
+LAST_TEMP_ALERT=0
+LAST_SWAP_ALERT=0
+
+notify() {
+  local title="$1" msg="$2"
+  osascript -e "display notification \"$msg\" with title \"$title\" sound name \"Sosumi\""
+}
+
+# CSV header if new
+[ ! -f "$LOG" ] && echo "timestamp,cpu_temp_C,gpu_temp_C,fan1_rpm,fan2_rpm,mem_used_GB,swap_GB,compressed_GB,mem_pressure_pct,top_cpu_proc,top_mem_proc" > "$LOG"
+
+echo "Logging to $LOG every ${INTERVAL}s. Temp alert>${TEMP_MAX}C, swap alert>${SWAP_MAX}GB."
+echo "Need sudo for SMC temps."
+sudo -v || { echo "sudo required"; exit 1; }
+
+# Keep sudo alive
+( while true; do sudo -n true; sleep 60; done ) &
+SUDO_PID=$!
+trap "kill $SUDO_PID 2>/dev/null; exit" INT TERM
+
+while true; do
+  TS=$(date '+%Y-%m-%d %H:%M:%S')
+
+  # SMC sample (one shot)
+  SMC=$(sudo powermetrics --samplers smc,thermal -n 1 -i 200 2>/dev/null)
+  CPU_TEMP=$(echo "$SMC" | awk -F': ' '/CPU die temperature/ {print $2; exit}' | awk '{print $1}')
+  GPU_TEMP=$(echo "$SMC" | awk -F': ' '/GPU die temperature/ {print $2; exit}' | awk '{print $1}')
+  FAN1=$(echo "$SMC" | awk -F': ' '/Fan 1/ {print $2; exit}' | awk '{print $1}')
+  FAN2=$(echo "$SMC" | awk -F': ' '/Fan 2/ {print $2; exit}' | awk '{print $1}')
+  THERMAL_PRESSURE=$(echo "$SMC" | awk -F': ' '/Current pressure level/ {print $2; exit}')
+
+  # Memory via vm_stat + sysctl
+  PAGE_SIZE=$(sysctl -n hw.pagesize)
+  VM=$(vm_stat)
+  PAGES_ACTIVE=$(echo "$VM" | awk '/Pages active/ {gsub(/\./,"",$3); print $3}')
+  PAGES_WIRED=$(echo "$VM" | awk '/Pages wired/ {gsub(/\./,"",$4); print $4}')
+  PAGES_COMPRESSED=$(echo "$VM" | awk '/Pages occupied by compressor/ {gsub(/\./,"",$5); print $5}')
+  SWAP_USED=$(sysctl -n vm.swapusage | awk '{print $6}' | sed 's/M//')
+
+  MEM_USED_GB=$(echo "scale=2; ($PAGES_ACTIVE + $PAGES_WIRED) * $PAGE_SIZE / 1073741824" | bc)
+  COMPRESSED_GB=$(echo "scale=2; $PAGES_COMPRESSED * $PAGE_SIZE / 1073741824" | bc)
+  SWAP_GB=$(echo "scale=2; $SWAP_USED / 1024" | bc)
+  TOTAL_GB=$(echo "scale=0; $(sysctl -n hw.memsize) / 1073741824" | bc)
+  MEM_PCT=$(echo "scale=0; $MEM_USED_GB * 100 / $TOTAL_GB" | bc)
+
+  # Top procs
+  TOP_CPU=$(ps -Ao comm,%cpu -r | sed -n '2p' | awk '{print $1":"$2"%"}')
+  TOP_MEM=$(ps -Ao comm,rss -m | sed -n '2p' | awk '{print $1":"int($2/1024)"MB"}')
+
+  echo "$TS,$CPU_TEMP,$GPU_TEMP,$FAN1,$FAN2,$MEM_USED_GB,$SWAP_GB,$COMPRESSED_GB,$MEM_PCT,$TOP_CPU,$TOP_MEM" >> "$LOG"
+
+  # Console line
+  printf "%s  CPU:%s°C GPU:%s°C Fan:%s/%s RPM  Mem:%sG Swap:%sG Comp:%sG  Pressure:%s  Top:%s\n" \
+    "$TS" "$CPU_TEMP" "$GPU_TEMP" "$FAN1" "$FAN2" "$MEM_USED_GB" "$SWAP_GB" "$COMPRESSED_GB" "$THERMAL_PRESSURE" "$TOP_CPU"
+
+  # Alerts
+  NOW=$(date +%s)
+  if [ -n "$CPU_TEMP" ] && (( $(echo "$CPU_TEMP > $TEMP_MAX" | bc -l) )); then
+    if (( NOW - LAST_TEMP_ALERT > ALERT_COOLDOWN )); then
+      notify "🔥 Mac Hot: ${CPU_TEMP}°C" "Top CPU: $TOP_CPU | Fan: ${FAN1}/${FAN2} RPM"
+      LAST_TEMP_ALERT=$NOW
+    fi
+  fi
+  if (( $(echo "$SWAP_GB > $SWAP_MAX" | bc -l) )); then
+    if (( NOW - LAST_SWAP_ALERT > ALERT_COOLDOWN )); then
+      notify "💾 Swap High: ${SWAP_GB}GB" "Top mem: $TOP_MEM | Compressed: ${COMPRESSED_GB}GB"
+      LAST_SWAP_ALERT=$NOW
+    fi
+  fi
+
+  sleep "$INTERVAL"
+done

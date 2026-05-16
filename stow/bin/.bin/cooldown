@@ -1,0 +1,277 @@
+#!/bin/bash
+# Mac cooldown — kills runaway daemons, purges cache, shows swap owners.
+# Usage: ./cooldown.sh [--aggressive] [--dry-run] [--no-color]
+
+AGGRESSIVE=0
+DRY=0
+NOCOLOR=0
+for arg in "$@"; do
+  case "$arg" in
+    --aggressive|-a) AGGRESSIVE=1 ;;
+    --dry-run|-n) DRY=1 ;;
+    --no-color) NOCOLOR=1 ;;
+    -h|--help) sed -n '2,5p' "$0"; exit 0 ;;
+  esac
+done
+
+# ---------- styling ----------
+has() { command -v "$1" >/dev/null 2>&1; }
+USE_GUM=0; USE_LOLCAT=0; USE_FIGLET=0
+[ "$NOCOLOR" = 0 ] && has gum && USE_GUM=1
+[ "$NOCOLOR" = 0 ] && has lolcat && USE_LOLCAT=1
+[ "$NOCOLOR" = 0 ] && has figlet && USE_FIGLET=1
+
+# ANSI fallbacks
+C_RED=$'\033[31m'; C_GRN=$'\033[32m'; C_YEL=$'\033[33m'
+C_BLU=$'\033[34m'; C_MAG=$'\033[35m'; C_CYN=$'\033[36m'
+C_BOLD=$'\033[1m'; C_DIM=$'\033[2m'; C_RST=$'\033[0m'
+[ "$NOCOLOR" = 1 ] && C_RED= C_GRN= C_YEL= C_BLU= C_MAG= C_CYN= C_BOLD= C_DIM= C_RST=
+
+banner() {
+  if [ "$USE_FIGLET" = 1 ] && [ "$USE_LOLCAT" = 1 ]; then
+    figlet -f small "$1" | lolcat
+  elif [ "$USE_FIGLET" = 1 ]; then
+    echo "${C_CYN}${C_BOLD}"; figlet -f small "$1"; echo "${C_RST}"
+  else
+    echo "${C_CYN}${C_BOLD}══ $1 ══${C_RST}"
+  fi
+}
+
+section() {
+  if [ "$USE_GUM" = 1 ]; then
+    gum style --foreground 212 --bold --margin "1 0" --padding "0 1" --border thick --border-foreground 99 "$1"
+  else
+    echo ""
+    echo "${C_MAG}${C_BOLD}▌ $1${C_RST}"
+    echo "${C_DIM}$(printf '─%.0s' $(seq 1 50))${C_RST}"
+  fi
+}
+
+ok()   { echo "${C_GRN}✓${C_RST} $*"; }
+warn() { echo "${C_YEL}⚠${C_RST}  $*"; }
+err()  { echo "${C_RED}✗${C_RST} $*"; }
+info() { echo "${C_BLU}ℹ${C_RST} $*"; }
+dim()  { echo "${C_DIM}$*${C_RST}"; }
+
+rainbow_line() {
+  if [ "$USE_LOLCAT" = 1 ]; then
+    printf '%.0s━' {1..60} | lolcat
+    echo ""
+  else
+    echo "${C_CYN}$(printf '━%.0s' $(seq 1 60))${C_RST}"
+  fi
+}
+
+# ---------- stats ----------
+get_temp() {
+  sudo powermetrics --samplers smc -n 1 -i 200 2>/dev/null \
+    | awk -F': ' '/CPU die temperature/ {print $2; exit}' | awk '{print $1}'
+}
+get_load() { uptime | awk -F'load averages?:' '{print $2}' | awk '{print $1}'; }
+get_swap() { sysctl -n vm.swapusage | awk '{print $6}'; }
+get_swap_total() { sysctl -n vm.swapusage | awk '{print $3}'; }
+get_swap_free() { sysctl -n vm.swapusage | awk '{print $9}'; }
+get_mem_pct() {
+  local total used
+  total=$(sysctl -n hw.memsize)
+  used=$(vm_stat | awk '
+    /Pages active/      {gsub(/\./,"",$3); a=$3}
+    /Pages wired/       {gsub(/\./,"",$4); w=$4}
+    /Pages occupied/    {gsub(/\./,"",$5); c=$5}
+    END {print (a+w+c)*16384}')
+  echo "scale=0; $used*100/$total" | bc
+}
+
+run() {
+  if [ "$DRY" = 1 ]; then
+    dim "  [dry] $*"
+  else
+    eval "$@" 2>/dev/null && ok "$1" || dim "  $1 (not running)"
+  fi
+}
+
+# ---------- start ----------
+clear
+banner "COOLDOWN"
+[ "$DRY" = 1 ] && warn "DRY-RUN mode — nothing will be killed"
+[ "$AGGRESSIVE" = 1 ] && warn "AGGRESSIVE mode — heavy apps will be restarted"
+echo ""
+
+# Cache sudo upfront
+sudo -v || { err "sudo required"; exit 1; }
+
+info "Capturing baseline metrics..."
+TEMP_BEFORE=$(get_temp)
+LOAD_BEFORE=$(get_load)
+SWAP_BEFORE=$(get_swap)
+MEM_PCT_BEFORE=$(get_mem_pct)
+ok "Baseline: ${TEMP_BEFORE}°C • Load ${LOAD_BEFORE} • Swap ${SWAP_BEFORE} • Mem ${MEM_PCT_BEFORE}%"
+
+# Basename helper for awk (strip path from comm)
+APP_NAME='n=split($2,p,"/"); name=p[n]'
+
+section "🔥 Top 8 CPU hogs"
+ps -Ao pid,comm,%cpu,rss -r | head -9 | awk -v h="$APP_NAME" '
+  NR==1 {printf "  %-8s %-30s %9s %10s\n",$1,"COMMAND",$3,"RSS"; next}
+  {n=split($2,p,"/"); name=p[n]; printf "  %-8s %-30s %8s%% %8.0fMB\n",$1,substr(name,1,30),$3,$4/1024}'
+
+section "💾 Top 8 memory hogs"
+ps -Ao pid,comm,rss,vsz -m | head -9 | awk '
+  NR==1 {printf "  %-8s %-30s %10s %10s\n",$1,"COMMAND","RSS(MB)","VSZ(GB)"; next}
+  {n=split($2,p,"/"); name=p[n]; printf "  %-8s %-30s %10.0f %10.1f\n",$1,substr(name,1,30),$3/1024,$4/1024/1024}'
+dim "  RSS = in RAM. VSZ-RSS gap = likely swapped/mmapped."
+
+section "💀 Killing runaway daemons"
+
+# iCloud / sync — relaunch on demand
+run "sudo killall peopled"                    # Contacts sync
+run "sudo killall CallHistorySyncHelper"      # Call history
+run "sudo killall cloudd"                     # CloudKit
+run "sudo killall bird"                       # iCloud Drive
+run "sudo killall photoanalysisd"             # Photos ML
+run "sudo killall mediaanalysisd"             # Media ML
+run "sudo killall photolibraryd"              # Photos library
+run "sudo killall AMPLibraryAgent"            # Apple Music
+run "sudo killall knowledge-agent"            # Siri knowledge
+run "sudo killall suggestd"                   # Siri suggestions
+run "sudo killall parsecd"                    # Spotlight remote
+run "sudo killall mds_stores"                 # Spotlight indexer
+run "sudo killall corespotlightd"             # CoreSpotlight
+
+# UI leaks
+run "killall AltTab && open -a AltTab"
+
+if [ "$AGGRESSIVE" = 1 ]; then
+  section "🧨 AGGRESSIVE: heavy app restarts"
+  run "killall Slack"
+  run "killall 'Google Chrome'"
+  run "killall Arc"
+  run "killall Spotify"
+  run "killall Podcasts"
+  run "pkill -f 'Code Helper'"
+fi
+
+section "🧹 Purging inactive RAM"
+if [ "$DRY" = 1 ]; then dim "  [dry] sudo purge"
+else sudo purge && ok "purge complete (frees inactive + file cache)"
+fi
+
+# ---------- swap owners ----------
+section "🔍 Likely swap holders (largest VSZ-RSS gap)"
+ps -Ao pid,comm,rss,vsz -m | awk 'NR>1 {
+  rss=$3; vsz=$4; gap=vsz-rss;
+  if (gap > 100000) {
+    n=split($2,p,"/"); name=p[n];
+    printf "  %-8s %-30s gap %.1f GB\n",$1,substr(name,1,30),gap/1024/1024
+  }
+}' | head -8
+dim "  These processes likely hold pages in swap. Quit them to reclaim swap."
+
+# ---------- swap analysis + reboot suggestion ----------
+section "⚖️  Swap recommendation"
+SWAP_NUM=$(echo "$SWAP_BEFORE" | sed 's/M//')
+SWAP_GB=$(echo "scale=1; $SWAP_NUM/1024" | bc)
+
+# Measure churn
+S1=$(sysctl -n vm.swapusage | awk '{print $6}' | sed 's/M//')
+sleep 3
+S2=$(sysctl -n vm.swapusage | awk '{print $6}' | sed 's/M//')
+CHURN=$(echo "$S2 - $S1" | bc)
+
+info "Swap used: ${SWAP_GB} GB"
+info "Churn (3s): ${CHURN} MB change"
+
+if (( $(echo "$SWAP_GB > 8" | bc -l) )); then
+  err "Swap >8GB. Static swap is harmless but indicates heavy RAM pressure."
+  warn "Recommend: quit Docker Desktop, Podcasts, restart Chrome/Arc."
+  warn "Nuclear: reboot. Frees all swap, resets daemon state."
+  if [ "$USE_GUM" = 1 ] && [ "$DRY" = 0 ]; then
+    if gum confirm "Reboot now?"; then
+      sudo shutdown -r now
+    fi
+  else
+    echo "  Run: ${C_BOLD}sudo shutdown -r now${C_RST}  (when ready)"
+  fi
+elif (( $(echo "$CHURN > 50" | bc -l) )) || (( $(echo "$CHURN < -50" | bc -l) )); then
+  warn "Active swap churn detected — heat source. Quit memory hogs above."
+else
+  ok "Swap idle (no churn). Harmless."
+fi
+
+# ---------- container check ----------
+section "🐳 Container runtime"
+if pgrep -q OrbStack && pgrep -q "Docker Desktop"; then
+  err "Both OrbStack AND Docker Desktop running — quit one"
+elif pgrep -q OrbStack; then
+  ok "OrbStack running"
+  docker stats --no-stream --format "  {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}" 2>/dev/null | head -8
+elif pgrep -q "Docker Desktop"; then
+  warn "Docker Desktop running (~5GB RAM). Migrate to OrbStack."
+fi
+
+# ---------- after ----------
+echo ""; rainbow_line
+sleep 5
+
+TEMP_AFTER=$(get_temp)
+LOAD_AFTER=$(get_load)
+SWAP_AFTER=$(get_swap)
+MEM_PCT_AFTER=$(get_mem_pct)
+
+section "📈 BEFORE → AFTER"
+
+delta() {
+  awk -v b="$1" -v a="$2" -v u="$3" 'BEGIN{
+    d=a-b; if (d>0) {col="\033[31m+"} else if (d<0) {col="\033[32m"} else {col="\033[2m±"}
+    printf "%s%g%s\033[0m",col,d,u
+  }'
+}
+
+if [ "$USE_GUM" = 1 ]; then
+  BEFORE_BLOCK=$(printf "%s\n%s\n%s\n%s\n%s" \
+    "BEFORE" \
+    "CPU temp : ${TEMP_BEFORE}°C" \
+    "Load avg : ${LOAD_BEFORE}" \
+    "Swap     : ${SWAP_BEFORE}" \
+    "Mem used : ${MEM_PCT_BEFORE}%")
+  AFTER_BLOCK=$(printf "%s\n%s\n%s\n%s\n%s" \
+    "AFTER" \
+    "CPU temp : ${TEMP_AFTER}°C  $(delta $TEMP_BEFORE $TEMP_AFTER °C)" \
+    "Load avg : ${LOAD_AFTER}  $(delta $LOAD_BEFORE $LOAD_AFTER '')" \
+    "Swap     : ${SWAP_AFTER}" \
+    "Mem used : ${MEM_PCT_AFTER}%  $(delta $MEM_PCT_BEFORE $MEM_PCT_AFTER %)")
+
+  LEFT=$(gum style --border rounded --border-foreground 244 --padding "0 2" --width 32 "$BEFORE_BLOCK")
+  RIGHT=$(gum style --border rounded --border-foreground 99 --padding "0 2" --width 38 "$AFTER_BLOCK")
+  gum join --horizontal "$LEFT" "$RIGHT"
+else
+  # Plain side-by-side via paste
+  LEFT_FILE=$(mktemp); RIGHT_FILE=$(mktemp)
+  {
+    echo "${C_BOLD}BEFORE${C_RST}"
+    echo "${C_DIM}──────────────────────${C_RST}"
+    echo "CPU temp : ${TEMP_BEFORE}°C"
+    echo "Load avg : ${LOAD_BEFORE}"
+    echo "Swap     : ${SWAP_BEFORE}"
+    echo "Mem used : ${MEM_PCT_BEFORE}%"
+  } > "$LEFT_FILE"
+  {
+    echo "${C_BOLD}AFTER${C_RST}"
+    echo "${C_DIM}──────────────────────────────${C_RST}"
+    echo "CPU temp : ${TEMP_AFTER}°C  $(delta $TEMP_BEFORE $TEMP_AFTER °C)"
+    echo "Load avg : ${LOAD_AFTER}  $(delta $LOAD_BEFORE $LOAD_AFTER '')"
+    echo "Swap     : ${SWAP_AFTER}"
+    echo "Mem used : ${MEM_PCT_AFTER}%  $(delta $MEM_PCT_BEFORE $MEM_PCT_AFTER %)"
+  } > "$RIGHT_FILE"
+  paste -d'│' "$LEFT_FILE" "$RIGHT_FILE" | awk -F'│' '{printf "  %-30s ${C_DIM}│${C_RST} %s\n",$1,$2}'
+  rm -f "$LEFT_FILE" "$RIGHT_FILE"
+fi
+
+osascript -e "display notification \"Temp: ${TEMP_BEFORE}°C → ${TEMP_AFTER}°C | Mem: ${MEM_PCT_BEFORE}% → ${MEM_PCT_AFTER}%\" with title \"❄️ Cooldown done\""
+
+echo ""
+if [ "$USE_LOLCAT" = 1 ]; then
+  echo "Done." | lolcat
+else
+  echo "${C_GRN}${C_BOLD}Done.${C_RST}"
+fi
