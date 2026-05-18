@@ -2,6 +2,12 @@
 # @ AI Context: Automation script to stow all packages in the stow/ directory.
 # This script ensures that every subdirectory in stow/ is linked to the home directory.
 
+# @ AI Context: Dry-run guard. The wizard exports DRY_RUN=1 to skip real work.
+if [ "${DRY_RUN:-0}" = "1" ]; then
+    echo "[DRY] stow-all.sh would stow all packages in $HOME/.dotfiles/stow"
+    exit 0
+fi
+
 DOTFILES_DIR="$HOME/.dotfiles"
 STOW_DIR="$DOTFILES_DIR/stow"
 
