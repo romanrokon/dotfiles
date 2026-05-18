@@ -32,5 +32,5 @@ gum
 lolcat
 figlet
 orbstack
-jordanbaird-ice
+jordanbaird-ice@beta
 tg-pro
