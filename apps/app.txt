@@ -9,6 +9,5 @@ Messenger
 Whatsapp
 Blackmagic Disk Speed Test
 Boom2
-Hidden Bar
 Ethernet Status Lite
 BombSquad
