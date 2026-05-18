@@ -34,3 +34,4 @@ figlet
 orbstack
 jordanbaird-ice@beta
 tg-pro
+cbonsai
