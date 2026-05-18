@@ -18,3 +18,7 @@
 
 - Put any non project and temp files inside `NOGIT` folder. This filder will be globally ignored by git.
 - Never put Co-authored-by in commit messages
+
+# Hard rule for NextJS
+
+Never make or convert a full page to dynamic or ISR for a dynamic component in that page. Make the leaf component client and use api routes with proper caching and revalidation. If makes sense propose for PPR. You must confirm the user about these decisions using your interactive QA prompt not just plain text in the output, which could be missed easily.
