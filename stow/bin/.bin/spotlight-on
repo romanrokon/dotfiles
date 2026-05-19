@@ -1,0 +1,24 @@
+#!/bin/bash
+# Re-enable macOS Spotlight indexing.
+# Rebuilds index from scratch — 30-60min CPU + heat.
+
+set -e
+
+if [ "$(uname)" != "Darwin" ]; then
+  echo "macOS only." >&2
+  exit 1
+fi
+
+echo "Enabling Spotlight indexing on all volumes..."
+sudo mdutil -a -i on
+
+echo "Forcing fresh rebuild..."
+sudo mdutil -E /
+
+echo ""
+echo "Current state:"
+sudo mdutil -a -s
+
+echo ""
+echo "Done. Index rebuilds in background (30-60min). Expect CPU + heat during build."
+echo "Disable again: spotlight-off"

@@ -12,6 +12,13 @@ _tweaks_mac() {
     # iTerm prefs folder
     defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "$HOME/.config/iterm2"
     defaults write com.googlecode.iterm2.plist LoadPrefsFromCustomFolder -bool true
+
+    # Spotlight indexing — opinionated off. Raycast is the launcher; mds_stores
+    # churn is a known heat/RAM source. Reversible via `spotlight-on`.
+    if tui_yesno "Spotlight" "Disable Spotlight indexing? (Raycast unaffected. Re-enable with: spotlight-on)"; then
+        sudo mdutil -a -i off || true
+        sudo mdutil -E / || true
+    fi
 }
 
 _tweaks_linux() {

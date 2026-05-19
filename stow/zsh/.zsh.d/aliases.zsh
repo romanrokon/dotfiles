@@ -49,3 +49,7 @@ alias cool='cooldown'
 alias coola='cooldown --aggressive'
 alias coold='cooldown --dry-run'
 alias heat='heatlog'
+
+# Spotlight toggle (Raycast unaffected)
+alias spot-off='spotlight-off'
+alias spot-on='spotlight-on'

@@ -1,0 +1,25 @@
+#!/bin/bash
+# Disable macOS Spotlight indexing + erase index.
+# Raycast is unaffected (independent indexer).
+# Reversible via `spotlight-on`.
+
+set -e
+
+if [ "$(uname)" != "Darwin" ]; then
+  echo "macOS only." >&2
+  exit 1
+fi
+
+echo "Disabling Spotlight indexing on all volumes..."
+sudo mdutil -a -i off
+
+echo "Erasing existing Spotlight index (frees disk + stops mds_stores churn)..."
+sudo mdutil -E /
+
+echo ""
+echo "Current state:"
+sudo mdutil -a -s
+
+echo ""
+echo "Done. Raycast still works."
+echo "Re-enable: spotlight-on"
