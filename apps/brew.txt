@@ -36,3 +36,4 @@ jordanbaird-ice@beta
 tg-pro
 cbonsai
 aria2
+swiftbar
