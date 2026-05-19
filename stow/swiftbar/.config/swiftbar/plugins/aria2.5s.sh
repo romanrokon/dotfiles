@@ -14,7 +14,8 @@ RPC_URL="http://localhost:6800/jsonrpc"
 RPC_SECRET="changeme-local-only"
 PLIST="$HOME/Library/LaunchAgents/com.rzman.aria2.plist"
 LABEL="com.rzman.aria2"
-WEBUI_URL="http://ariang.mayswind.net/latest/AriaNg/#!/settings/rpc/set"
+# Hosted AriaNg with RPC preset baked into URL (secret base64-encoded)
+ARIANG_URL="https://ariang.mayswind.net/latest/#!/settings/rpc/set?protocol=http&host=localhost&port=6800&interface=jsonrpc&secret=Y2hhbmdlbWUtbG9jYWwtb25seQ%3D%3D"
 
 rpc() {
   local method=$1
@@ -32,14 +33,33 @@ if [ -n "$GLOBAL_STAT" ] && echo "$GLOBAL_STAT" | grep -q '"result"'; then
   RUNNING=1
 fi
 
+# Format bytes/sec → human readable (KB/MB/GB)
+fmt_speed() {
+  awk -v b="$1" 'BEGIN{
+    if (b >= 1073741824) printf "%.2f GB/s", b/1073741824
+    else if (b >= 1048576) printf "%.2f MB/s", b/1048576
+    else if (b >= 1024) printf "%.1f KB/s", b/1024
+    else printf "%d B/s", b
+  }'
+}
+
+# Format bytes → human readable (KB/MB/GB)
+fmt_bytes() {
+  awk -v b="$1" 'BEGIN{
+    if (b >= 1073741824) printf "%.2f GB", b/1073741824
+    else if (b >= 1048576) printf "%.2f MB", b/1048576
+    else if (b >= 1024) printf "%.1f KB", b/1024
+    else printf "%d B", b
+  }'
+}
+
 # --- menu bar text ---
 if [ "$RUNNING" = 1 ]; then
   ACTIVE=$(echo "$GLOBAL_STAT" | jq -r '.result.numActive // "0"')
   WAITING=$(echo "$GLOBAL_STAT" | jq -r '.result.numWaiting // "0"')
   DL_SPEED=$(echo "$GLOBAL_STAT" | jq -r '.result.downloadSpeed // "0"')
-  DL_KB=$((DL_SPEED / 1024))
   if [ "$ACTIVE" -gt 0 ]; then
-    echo "⬇ $ACTIVE • ${DL_KB} KB/s"
+    echo "⬇ $ACTIVE • $(fmt_speed $DL_SPEED)"
   else
     echo "⬇ idle"
   fi
@@ -52,14 +72,24 @@ echo "---"
 if [ "$RUNNING" = 1 ]; then
   echo "✓ aria2 running"
   echo "Active: $ACTIVE   Waiting: $WAITING"
-  echo "↓ $(echo "scale=1; $DL_SPEED/1024" | bc) KB/s"
+  echo "↓ $(fmt_speed $DL_SPEED)"
   echo "---"
 
-  # Active downloads list
+  # Active downloads list with progress
   ACTIVE_JSON=$(rpc aria2.tellActive)
   if [ -n "$ACTIVE_JSON" ]; then
     echo "$ACTIVE_JSON" | jq -r '.result[]? |
-      "\(.files[0].path // "?" | split("/") | .[-1]) | size=10 trim=true href=\("file://" + (.files[0].path // ""))"' 2>/dev/null | head -10
+      "\(.files[0].path // "?" | split("/") | .[-1] | .[0:50])  \((.completedLength|tonumber)/((.totalLength|tonumber)+0.0001)*100 | floor)%  \(.completedLength)/\(.totalLength) | size=11 trim=true"' 2>/dev/null | \
+    while IFS= read -r line; do
+      # Replace raw byte counts with human-readable
+      done_b=$(echo "$line" | awk -F'  ' '{print $3}' | awk -F'/' '{print $1}')
+      total_b=$(echo "$line" | awk -F'  ' '{print $3}' | awk -F'/' '{split($2,a," "); print a[1]}')
+      meta=$(echo "$line" | awk -F'  ' '{print $3}' | awk -F'/' '{split($2,a," "); for(i=2;i<=length(a);i++) printf " %s",a[i]}')
+      name_pct=$(echo "$line" | awk -F'  ' '{print $1"  "$2}')
+      done_h=$(fmt_bytes $done_b)
+      total_h=$(fmt_bytes $total_b)
+      echo "$name_pct  $done_h / $total_h |$meta"
+    done | head -10
   fi
   echo "---"
 else
@@ -68,7 +98,7 @@ else
 fi
 
 # Actions
-echo "Open web UI (AriaNg) | href=$WEBUI_URL"
+echo "Open web UI (AriaNg) | href=$ARIANG_URL"
 echo "Open Downloads folder | bash=open param0=$HOME/Downloads terminal=false"
 echo "---"
 
