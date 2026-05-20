@@ -1,0 +1,49 @@
+#!/bin/bash
+# Pi-hole Teleporter backup via SSH.
+# Uses 'pihole' ssh alias (defined in ssh/config.local from private repo).
+# Stores zips in BACKUP_DIR, rotates to KEEP newest.
+
+set -euo pipefail
+
+SSH_HOST="${PIHOLE_SSH_HOST:-pihole}"
+BACKUP_DIR="${PIHOLE_BACKUP_DIR:-$HOME/Library/Mobile Documents/com~apple~CloudDocs/Backups/pihole}"
+KEEP="${PIHOLE_BACKUP_KEEP:-8}"
+
+mkdir -p "$BACKUP_DIR"
+
+TS=$(date '+%Y-%m-%d_%H-%M-%S')
+LOCAL_FILE="$BACKUP_DIR/pihole-${TS}.zip"
+
+echo "→ Generating backup on $SSH_HOST..."
+REMOTE_FILE=$(ssh -o BatchMode=yes "$SSH_HOST" 'cd /tmp && pihole-FTL --teleporter' 2>/dev/null | tail -1)
+
+if [ -z "$REMOTE_FILE" ]; then
+  echo "✗ Teleporter produced no output filename" >&2
+  exit 1
+fi
+
+echo "→ Fetching /tmp/$REMOTE_FILE → $LOCAL_FILE"
+# Stream over ssh stdout — avoids needing sftp-server on the pi
+ssh -o BatchMode=yes "$SSH_HOST" "cat /tmp/$REMOTE_FILE" > "$LOCAL_FILE"
+
+# Clean up remote temp
+ssh -o BatchMode=yes "$SSH_HOST" "rm -f /tmp/$REMOTE_FILE"
+
+SIZE=$(du -h "$LOCAL_FILE" | cut -f1)
+echo "✓ Saved $LOCAL_FILE ($SIZE)"
+
+# Rotate — keep newest $KEEP
+echo "→ Rotating (keeping last $KEEP)..."
+cd "$BACKUP_DIR"
+# shellcheck disable=SC2012
+ls -1t pihole-*.zip 2>/dev/null | tail -n +"$((KEEP + 1))" | while read -r old; do
+  echo "  trash $old"
+  trash "$old" 2>/dev/null || rm -f "$old"
+done
+
+# Native notification on macOS
+if [ "$(uname)" = "Darwin" ] && command -v osascript >/dev/null 2>&1; then
+  osascript -e "display notification \"$SIZE — kept last $KEEP\" with title \"🛡 Pi-hole backup\""
+elif command -v notify-send >/dev/null 2>&1; then
+  notify-send "🛡 Pi-hole backup" "$SIZE — kept last $KEEP"
+fi
