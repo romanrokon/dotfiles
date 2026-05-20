@@ -29,9 +29,29 @@ plugins=(
     python
     pipenv
     zsh-nvm
+    fzf-tab
 )
 
 source "$ZSH/oh-my-zsh.sh"
+
+# fzf shell integration (Ctrl+T, Ctrl+R, Alt+C, ** trigger)
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+command -v fzf >/dev/null 2>&1 && eval "$(fzf --zsh)" 2>/dev/null
+
+# fzf-git.sh — adds <CTRL+G CTRL+...> bindings for git branches/files/commits/stashes/tags
+[ -f ~/.fzf-git/fzf-git.sh ] && source ~/.fzf-git/fzf-git.sh
+
+# forgit — interactive git ops (ga, glo, gd, gco, gss, gclean, etc.)
+# brew install puts it at /opt/homebrew/opt/forgit; the setup wizard also clones
+# a copy to ~/.forgit so non-brew machines (Linux) work the same way.
+for _f in \
+  /opt/homebrew/opt/forgit/share/forgit/forgit.plugin.zsh \
+  /home/linuxbrew/.linuxbrew/opt/forgit/share/forgit/forgit.plugin.zsh \
+  "$HOME/.forgit/forgit.plugin.zsh"
+do
+  [ -f "$_f" ] && source "$_f" && break
+done
+unset _f
 
 # Preferred editor
 if [[ -n $SSH_CONNECTION ]]; then

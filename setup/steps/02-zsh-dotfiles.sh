@@ -3,11 +3,25 @@
 # Runs early so the user has a working terminal environment before the long
 # brew/apt apps install kicks off in the background.
 
+_clone_zsh_plugin() {
+    local repo=$1 dest=$2
+    [ -d "$dest" ] && return 0
+    log_info "Cloning $repo → $dest"
+    git clone --depth=1 "$repo" "$dest" >> "$LOG_FILE" 2>&1
+}
+
 step_zsh_dotfiles() {
     cd "$DOTFILES_DIR" || return 1
     chmod +x stow-all.sh
     log_info "Running stow-all.sh"
     ./stow-all.sh >> "$LOG_FILE" 2>&1 || return 1
+
+    # Third-party zsh plugins not in oh-my-zsh / brew / apt — cloned to known paths.
+    local omz_custom="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+    _clone_zsh_plugin https://github.com/Aloxaf/fzf-tab.git "$omz_custom/plugins/fzf-tab"
+    _clone_zsh_plugin https://github.com/junegunn/fzf-git.sh.git "$HOME/.fzf-git"
+    # forgit is in brew on macOS but not apt — clone so Linux gets it too
+    _clone_zsh_plugin https://github.com/wfxr/forgit.git "$HOME/.forgit"
 
     # Switch login shell to zsh if not already
     local current_shell zsh_path

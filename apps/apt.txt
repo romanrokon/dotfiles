@@ -27,3 +27,11 @@ cbonsai
 jq
 lm-sensors
 libnotify-bin
+bat
+fzf
+fd-find
+ripgrep
+zoxide
+eza
+dnsutils
+bc

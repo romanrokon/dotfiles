@@ -23,6 +23,12 @@ alias lg='lazygit'
 [ -x /Applications/Tailscale.app/Contents/MacOS/Tailscale ] && \
   alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
 
+# Debian/Ubuntu rename binaries to avoid conflicts — alias back to upstream names
+if [[ "$OSTYPE" == "linux"* ]]; then
+  command -v fdfind >/dev/null 2>&1 && ! command -v fd >/dev/null 2>&1 && alias fd='fdfind'
+  command -v batcat >/dev/null 2>&1 && ! command -v bat >/dev/null 2>&1 && alias bat='batcat'
+fi
+
 auto-ls-ll() {
     ll
 }

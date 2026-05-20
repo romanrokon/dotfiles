@@ -1,4 +1,4 @@
-iterm2
+ghostty
 vimr
 alt-tab
 qlcolorcode
@@ -12,7 +12,6 @@ mos
 python-tk
 veracrypt
 asimov
-time-out
 gifski
 android-file-transfer
 yazi
@@ -37,3 +36,7 @@ tg-pro
 cbonsai
 aria2
 swiftbar
+bat
+forgit
+eza
+narugit/tap/smctemp
