@@ -61,7 +61,7 @@ if [ "$RUNNING" = 1 ]; then
   if [ "$ACTIVE" -gt 0 ]; then
     echo "⬇ $ACTIVE • $(fmt_speed $DL_SPEED)"
   else
-    echo "⬇ idle"
+    echo "⬇"
   fi
 else
   echo "⬇ off | color=gray"
