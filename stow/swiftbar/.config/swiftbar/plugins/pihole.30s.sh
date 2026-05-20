@@ -8,10 +8,25 @@
 
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:$PATH"
 
-PIHOLE_HOST="orangepi-pihole.monster-barley.ts.net"
-PIHOLE_IP="100.100.1.1"
+# Defaults; override via ~/.config/dotfiles/pihole.env (kept in private repo).
+PIHOLE_HOST=""
+PIHOLE_IP=""
 PROBE_DOMAIN="google.com"
 TIMEOUT=2
+
+PIHOLE_ENV="$HOME/.config/dotfiles/pihole.env"
+[ -f "$PIHOLE_ENV" ] && . "$PIHOLE_ENV"
+
+if [ -z "$PIHOLE_IP" ]; then
+  echo "🛡 ? | color=gray"
+  echo "---"
+  echo "Pi-hole not configured"
+  echo "Create $PIHOLE_ENV with: | size=10 color=gray"
+  echo "  PIHOLE_IP=100.x.x.x | size=10 color=gray"
+  echo "  PIHOLE_HOST=name.tailnet.ts.net | size=10 color=gray"
+  exit 0
+fi
+
 ADMIN_URL="http://${PIHOLE_IP}/admin"
 
 # --- Tailscale up? ---

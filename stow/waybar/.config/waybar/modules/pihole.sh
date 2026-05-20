@@ -2,10 +2,19 @@
 # Waybar custom module: Pi-hole over Tailscale liveness.
 # JSON {text, tooltip, class}.
 
-PIHOLE_HOST="orangepi-pihole.monster-barley.ts.net"
-PIHOLE_IP="100.100.1.1"
+# Defaults; override via ~/.config/dotfiles/pihole.env (kept in private repo).
+PIHOLE_HOST=""
+PIHOLE_IP=""
 PROBE_DOMAIN="google.com"
 TIMEOUT=2
+
+PIHOLE_ENV="$HOME/.config/dotfiles/pihole.env"
+[ -f "$PIHOLE_ENV" ] && . "$PIHOLE_ENV"
+
+if [ -z "$PIHOLE_IP" ]; then
+  echo '{"text":"󰒙 ?","tooltip":"Create ~/.config/dotfiles/pihole.env with PIHOLE_IP and PIHOLE_HOST","class":"off"}'
+  exit 0
+fi
 
 # Tailscale state
 TS_UP=0

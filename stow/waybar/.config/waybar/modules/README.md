@@ -24,7 +24,7 @@ Linux counterparts of the macOS SwiftBar plugins. Add to your `~/.config/waybar/
     "exec": "~/.config/waybar/modules/pihole.sh",
     "return-type": "json",
     "interval": 30,
-    "on-click": "xdg-open http://100.100.1.1/admin"
+    "on-click": "xdg-open http://$PIHOLE_IP/admin"
   },
   "custom/disk": {
     "exec": "~/.config/waybar/modules/disk.sh",
@@ -62,3 +62,14 @@ Style classes (`ok`, `warn`, `error`, `off`, `idle`, `active`) — add to `~/.co
 ```
 
 Edit `disk.sh` `VOLUMES=(...)` to match your mount layout. Defaults to `/`, `/home`, `/mnt/work`.
+
+## Pi-hole config (private)
+
+`pihole.sh` reads `~/.config/dotfiles/pihole.env`:
+
+```sh
+PIHOLE_IP=100.x.x.x
+PIHOLE_HOST=name.tailnet.ts.net
+```
+
+Keep this file in your private dotfiles repo, not the public one — it leaks tailnet identifiers.
