@@ -1,0 +1,3 @@
+# Flatpak apps (Linux). Install with: flatpak install -y flathub <id>
+# Not yet wired into the setup wizard; install manually.
+com.mitchellh.ghostty

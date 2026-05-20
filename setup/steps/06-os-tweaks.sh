@@ -1,6 +1,6 @@
 #!/bin/bash
-# @ AI Context: OS-specific tweaks. Mac: defaults writes for dock + key repeat
-# + iterm prefs. Linux: vm.swappiness, NoDisplay tweaks, tracker miner mask.
+# @ AI Context: OS-specific tweaks. Mac: defaults writes for dock + key repeat.
+# Linux: vm.swappiness, NoDisplay tweaks, tracker miner mask.
 
 _tweaks_mac() {
     defaults write -g ApplePressAndHoldEnabled -bool false
@@ -8,10 +8,6 @@ _tweaks_mac() {
     defaults write com.apple.dock autohide-time-modifier -float 0.3
     defaults write com.apple.Dock showhidden -bool TRUE
     killall Dock 2>/dev/null || true
-
-    # iTerm prefs folder
-    defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "$HOME/.config/iterm2"
-    defaults write com.googlecode.iterm2.plist LoadPrefsFromCustomFolder -bool true
 
     # Spotlight indexing — opinionated off. Raycast is the launcher; mds_stores
     # churn is a known heat/RAM source. Reversible via `spotlight-on`.
