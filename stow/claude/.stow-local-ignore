@@ -1,0 +1,4 @@
+# Files managed at runtime by Claude Code — kept here as snapshot, not stowed.
+# Regex anchored to package root.
+\.claude/plugins/installed_plugins\.json
+\.claude/plugins/known_marketplaces\.json
