@@ -46,6 +46,6 @@ fi
 
 # Deno
 [ -f "$HOME/.deno/env" ] && . "$HOME/.deno/env"
-if [[ ":$FPATH:" != *":/Users/rzman/.zsh/completions:"* ]]; then 
-    export FPATH="/Users/rzman/.zsh/completions:$FPATH"
+if [[ ":$FPATH:" != *":$HOME/.zsh/completions:"* ]]; then
+    export FPATH="$HOME/.zsh/completions:$FPATH"
 fi

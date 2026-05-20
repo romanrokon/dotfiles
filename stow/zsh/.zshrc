@@ -31,7 +31,7 @@ plugins=(
     zsh-nvm
 )
 
-source $ZSH/oh-my-zsh.sh
+source "$ZSH/oh-my-zsh.sh"
 
 # Preferred editor
 if [[ -n $SSH_CONNECTION ]]; then

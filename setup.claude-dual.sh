@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 # ==============================================================================
 # Dual Claude Code Environment Setup (Work + Personal)
@@ -22,6 +23,10 @@ fi
 # 1. Scaffold Directories
 mkdir -p "$WORK_DIR"
 mkdir -p "$BIN_DIR"
+if [ ! -w "$BIN_DIR" ]; then
+    echo "❌ Error: $BIN_DIR not writable."
+    exit 1
+fi
 echo "✅ Directories scaffolded."
 
 # 2. Generate VS Code Wrapper Script
@@ -61,12 +66,13 @@ ALIAS_STR="alias claude-work=\"CLAUDE_CONFIG_DIR=$WORK_DIR claude\""
 # Create .zshrc if it somehow doesn't exist
 touch "$ZSHRC"
 
-if ! grep -q "alias claude-work" "$ZSHRC"; then
+ALIASES_FILE="$HOME/.zsh.d/aliases.zsh"
+if grep -qs "alias claude-work" "$ZSHRC" "$ALIASES_FILE"; then
+    echo "⚡ Alias 'claude-work' already defined. Skipping injection."
+else
     echo -e "\n# Claude Dual Setup" >> "$ZSHRC"
     echo "$ALIAS_STR" >> "$ZSHRC"
     echo "✅ Alias 'claude-work' injected into .zshrc"
-else
-    echo "⚡ Alias already exists in .zshrc. Skipping."
 fi
 
 echo ""

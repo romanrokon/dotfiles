@@ -4,7 +4,7 @@
 # Private repo holds secret-ish configs (ssh hosts, tokens, etc) that
 # must NOT live in the public dotfiles repo.
 
-set -e
+set -euo pipefail
 
 # @ AI Context: Dry-run guard. The wizard exports DRY_RUN=1 to skip real work.
 if [ "${DRY_RUN:-0}" = "1" ]; then

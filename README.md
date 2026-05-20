@@ -1,61 +1,58 @@
-# Steps
+# dotfiles
 
-`git clone git@github.com:r0mankon/dotfiles.git ~/.dotfiles`
+```sh
+git clone git@github.com:r0mankon/dotfiles.git ~/.dotfiles
+cd ~/.dotfiles
+./setup.sh
+```
 
-`cd ~/.dotfiles`
+`setup.sh` is the unified entrypoint. It detects OS (macOS/Linux) and runs the right path. Use `DRY_RUN=1 ./setup.sh` to preview.
 
-## Linux
-`./setup.linux.sh`
+## Layout
 
-### With KDE specific fixes and packages
-`./setup.linux-kde.sh`
+- `setup.sh` — interactive wizard, dry-run aware, tracks state.
+- `setup.private.sh` — secrets / private overlays (separate repo).
+- `setup.claude-dual.sh` — install `claude-work` dual-config wrapper.
+- `stow-all.sh` — symlink every `stow/*/` package into `$HOME` via GNU Stow.
+- `stow/` — packages: `zsh`, `git`, `ghostty`, `lazygit`, `swiftbar`, `bin`, etc.
+- `brew.txt`, `apt.txt` — package manifests.
+- `NOGIT/` — globally git-ignored scratch / backups.
 
-## MacOS
+## Manual extras
 
-`./setup.mac.sh`
+### Fonts
 
-# Notes
+- **Editor**: Meslo / Menlo, JetBrains Mono, Cascadia Code
+- **Terminal**: [Meslo Nerd Font (P10k-patched)](https://github.com/romkatv/powerlevel10k/blob/master/font.md), Cascadia Mono PL
 
-Most of the things are automated except for deb & appImage packages which should be downloaded manually from the respective site.
+### Linux deb / AppImage
 
-## Fonts
+Some packages aren't in apt and must be downloaded manually from upstream.
 
-Sorted by preference
+### macOS — NTFS write support
 
-- ### Editor
+```sh
+brew tap gromgit/homebrew-fuse
+brew install ntfs-3g-mac
+```
 
-  - Meslo or Menlo
-  - Jetbrains Mono
-  - Cascadia Code
+Then disable SIP in recovery, replace `mount_ntfs`, re-enable SIP:
 
-- ### Terminal
+```sh
+csrutil disable                                          # in recovery
+sudo mount -uw /
+sudo mv /sbin/mount_ntfs /sbin/mount_ntfs.original
+sudo ln -s /usr/local/sbin/mount_ntfs /sbin/mount_ntfs
+csrutil enable                                           # in recovery
+```
 
-  - Meslo Nerd Font patched for Powerlevel10k (https://github.com/romkatv/powerlevel10k/blob/master/font.md)
-  - Cascadia Mono PL
+## Troubleshooting
 
-## Caution for others
+- **`stow` conflict**: target file already exists. Remove or back up, re-run.
+- **zoxide warning**: zoxide init must be last line in `.zshrc`. `_ZO_DOCTOR=0` suppresses it for Claude Code Bash tool which prepends `cd`.
+- **`compinit` insecure dirs**: `compaudit | xargs chmod g-w,o-w`.
+- **Missing completions**: drop files in `~/.zsh/completions/` (already on `$FPATH`).
 
-- Delete `.config/user-dirs.dirs` if you don't know what you're doing!
+## Caution
 
-# MacOS extras
-
-## Make ntfs drive writeable
-
-`brew tap gromgit/homebrew-fuse`
-`brew install ntfs-3g-mac`
-
-- ### Need to disable SIP in recovery mode
-
-   `csrutil disable`
-
-- ### Replace the built-in `mount_ntfs` with `ntfs-3g-mac`
-
-   ```sh
-   sudo mount -uw /
-   sudo mv /sbin/mount_ntfs /sbin/mount_ntfs.original
-   sudo ln -s /usr/local/sbin/mount_ntfs /sbin/mount_ntfs
-   ```
-
-- ### Re-enable SIP
-
-   `csrutil enable`
+- `~/.config/user-dirs.dirs` — don't blindly delete on Linux; it defines XDG user dirs.

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 # @ AI Context: Automation script to stow all packages in the stow/ directory.
 # This script ensures that every subdirectory in stow/ is linked to the home directory.
 

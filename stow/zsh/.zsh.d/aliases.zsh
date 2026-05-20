@@ -1,5 +1,5 @@
 alias cd='z'
-alias pro='cd /Volumes/Work/projects'
+[ -d /Volumes/Work/projects ] && alias pro='cd /Volumes/Work/projects'
 alias tree='eza --tree'
 alias find='fd --'
 alias grep='rg'
@@ -14,13 +14,12 @@ alias mv='mv -iv'
 alias vim='nvim'
 alias cal='gcal --starting-day=1'
 alias weather='curl v2.wttr.in'
-# alias ncu='npx ncu -i --format group'
 alias ncu='npx npm-check -u --format group'
 alias tgpt="terminalgpt"
-alias npm=pnpm
 alias lg='lazygit'
 
-alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
+[ -x /Applications/Tailscale.app/Contents/MacOS/Tailscale ] && \
+  alias tailscale="/Applications/Tailscale.app/Contents/MacOS/Tailscale"
 
 auto-ls-ll() {
     ll
