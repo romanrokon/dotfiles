@@ -1,0 +1,213 @@
+#!/bin/bash
+# Linux cooldown — kills runaway daemons, drops caches, shows top hogs.
+# Usage: cooldown [--aggressive] [--dry-run] [--no-color]
+# Dispatched here from `cooldown` when uname=Linux.
+
+AGGRESSIVE=0
+DRY=0
+NOCOLOR=0
+for arg in "$@"; do
+  case "$arg" in
+    --aggressive|-a) AGGRESSIVE=1 ;;
+    --dry-run|-n) DRY=1 ;;
+    --no-color) NOCOLOR=1 ;;
+    -h|--help) sed -n '2,5p' "$0"; exit 0 ;;
+  esac
+done
+
+# ---------- styling ----------
+has() { command -v "$1" >/dev/null 2>&1; }
+USE_GUM=0; USE_LOLCAT=0; USE_FIGLET=0
+[ "$NOCOLOR" = 0 ] && has gum && USE_GUM=1
+[ "$NOCOLOR" = 0 ] && has lolcat && USE_LOLCAT=1
+[ "$NOCOLOR" = 0 ] && has figlet && USE_FIGLET=1
+
+C_RED=$'\033[31m'; C_GRN=$'\033[32m'; C_YEL=$'\033[33m'
+C_BLU=$'\033[34m'; C_MAG=$'\033[35m'; C_CYN=$'\033[36m'
+C_BOLD=$'\033[1m'; C_DIM=$'\033[2m'; C_RST=$'\033[0m'
+[ "$NOCOLOR" = 1 ] && C_RED= C_GRN= C_YEL= C_BLU= C_MAG= C_CYN= C_BOLD= C_DIM= C_RST=
+
+banner() {
+  if [ "$USE_FIGLET" = 1 ] && [ "$USE_LOLCAT" = 1 ]; then
+    figlet -f small "$1" | lolcat
+  elif [ "$USE_FIGLET" = 1 ]; then
+    echo "${C_CYN}${C_BOLD}"; figlet -f small "$1"; echo "${C_RST}"
+  else
+    echo "${C_CYN}${C_BOLD}══ $1 ══${C_RST}"
+  fi
+}
+
+section() {
+  if [ "$USE_GUM" = 1 ]; then
+    gum style --foreground 212 --bold --margin "1 0" --padding "0 1" --border thick --border-foreground 99 "$1"
+  else
+    echo ""
+    echo "${C_MAG}${C_BOLD}▌ $1${C_RST}"
+    echo "${C_DIM}$(printf '─%.0s' $(seq 1 50))${C_RST}"
+  fi
+}
+
+ok()   { echo "${C_GRN}✓${C_RST} $*"; }
+warn() { echo "${C_YEL}⚠${C_RST}  $*"; }
+err()  { echo "${C_RED}✗${C_RST} $*"; }
+info() { echo "${C_BLU}ℹ${C_RST} $*"; }
+dim()  { echo "${C_DIM}$*${C_RST}"; }
+
+# ---------- stats ----------
+get_temp() {
+  # Pull highest core temp from sensors -u
+  if has sensors; then
+    sensors -u 2>/dev/null | awk -F': ' '/_input/ && /temp/ {print $2}' | sort -rn | head -1 | awk '{printf "%.0f", $1}'
+  fi
+}
+get_load() { uptime | awk -F'load average:' '{print $2}' | awk '{gsub(",", ""); print $1}'; }
+get_swap() {
+  awk '/SwapTotal/ {t=$2} /SwapFree/ {f=$2} END {printf "%.0fM", (t-f)/1024}' /proc/meminfo
+}
+get_swap_total() {
+  awk '/SwapTotal/ {printf "%.0fM", $2/1024}' /proc/meminfo
+}
+get_mem_pct() {
+  awk '/MemTotal/{t=$2} /MemAvailable/{a=$2} END{printf "%.0f", (t-a)*100/t}' /proc/meminfo
+}
+
+run() {
+  if [ "$DRY" = 1 ]; then
+    dim "  [dry] $*"
+  else
+    eval "$@" 2>/dev/null && ok "$1" || dim "  $1 (not running)"
+  fi
+}
+
+# ---------- start ----------
+clear
+banner "COOLDOWN"
+[ "$DRY" = 1 ] && warn "DRY-RUN mode"
+[ "$AGGRESSIVE" = 1 ] && warn "AGGRESSIVE mode"
+echo ""
+
+sudo -v || { err "sudo required"; exit 1; }
+
+info "Capturing baseline..."
+TEMP_BEFORE=$(get_temp)
+LOAD_BEFORE=$(get_load)
+SWAP_BEFORE=$(get_swap)
+MEM_PCT_BEFORE=$(get_mem_pct)
+ok "Baseline: ${TEMP_BEFORE:-?}°C • Load ${LOAD_BEFORE} • Swap ${SWAP_BEFORE} • Mem ${MEM_PCT_BEFORE}%"
+
+section "🔥 Top 8 CPU hogs"
+ps -eo pid,comm,%cpu,rss --sort=-%cpu | head -9 | awk '
+  NR==1 {printf "  %-8s %-30s %9s %10s\n",$1,"COMMAND",$3,"RSS"; next}
+  {printf "  %-8s %-30s %8s%% %8.0fMB\n",$1,substr($2,1,30),$3,$4/1024}'
+
+section "💾 Top 8 memory hogs"
+ps -eo pid,comm,rss,vsz --sort=-rss | head -9 | awk '
+  NR==1 {printf "  %-8s %-30s %10s %10s\n",$1,"COMMAND","RSS(MB)","VSZ(GB)"; next}
+  {printf "  %-8s %-30s %10.0f %10.1f\n",$1,substr($2,1,30),$3/1024,$4/1024/1024}'
+
+section "💀 Killing runaway daemons"
+
+# GNOME / Tracker / file indexers
+run "systemctl --user stop tracker-miner-fs-3.service tracker-miner-fs-control-3.service tracker-miner-rss-3.service tracker-extract-3.service"
+run "pkill -9 -f tracker-miner"
+run "pkill -9 -f tracker-extract"
+
+# KDE Baloo file indexer
+run "balooctl6 disable"
+run "pkill -9 -f baloo_file"
+
+# Evolution (calendar/mail daemons) — heavy idle
+run "pkill -9 -f evolution-source-registry"
+run "pkill -9 -f evolution-calendar-factory"
+run "pkill -9 -f evolution-addressbook-factory"
+
+# GNOME Software / packagekit background scans
+run "pkill -9 -f gnome-software"
+run "sudo systemctl stop packagekit"
+
+# snapd background refresh
+run "sudo systemctl stop snapd.service"
+
+# gvfs metadata storms (USB drive scans etc.)
+run "pkill -9 -f gvfs-udisks2"
+run "pkill -9 -f gvfs-metadata"
+
+# Browser dev orphans / dev servers
+if [ "$AGGRESSIVE" = 1 ]; then
+  section "🧨 AGGRESSIVE: heavy app restarts"
+  run "pkill -9 -f slack"
+  run "pkill -9 -f chrome"
+  run "pkill -9 -f firefox"
+  run "pkill -9 -f spotify"
+  run "pkill -9 -f 'next dev'"
+  run "pkill -9 -f 'next start'"
+  run "pkill -9 -f 'next build'"
+  run "pkill -9 -f 'next-server'"
+  run "pkill -9 -f vite"
+  run "pkill -9 -f webpack"
+  run "pkill -9 -f turbopack"
+  run "pkill -9 -f nodemon"
+  run "pkill -9 -f esbuild"
+  run "pkill -9 -f 'tsc --watch'"
+  run "pkill -9 -f tsserver"
+fi
+
+section "🧹 Dropping caches + compacting memory"
+if [ "$DRY" = 1 ]; then
+  dim "  [dry] sync && echo 3 > /proc/sys/vm/drop_caches"
+  dim "  [dry] echo 1 > /proc/sys/vm/compact_memory"
+else
+  sudo sh -c 'sync && echo 3 > /proc/sys/vm/drop_caches' && ok "page cache + dentries + inodes flushed"
+  sudo sh -c 'echo 1 > /proc/sys/vm/compact_memory' 2>/dev/null && ok "memory compacted"
+fi
+
+section "🔍 Likely swap holders (largest VSZ-RSS gap)"
+ps -eo pid,comm,rss,vsz --sort=-vsz | awk 'NR>1 {
+  rss=$3; vsz=$4; gap=vsz-rss;
+  if (gap > 100000) printf "  %-8s %-30s gap %.1f GB\n",$1,substr($2,1,30),gap/1024/1024
+}' | head -8
+
+section "⚖️  Swap recommendation"
+SWAP_KB=$(awk '/SwapTotal/{t=$2} /SwapFree/{f=$2} END{print t-f}' /proc/meminfo)
+SWAP_GB=$(awk -v k="$SWAP_KB" 'BEGIN{printf "%.1f", k/1048576}')
+info "Swap used: ${SWAP_GB} GB"
+if (( $(echo "$SWAP_GB > 4" | bc -l) )); then
+  warn "Swap >4GB. Consider: quit heavy apps, reboot if persistent."
+  if [ "$USE_GUM" = 1 ] && [ "$DRY" = 0 ]; then
+    if gum confirm "swapoff -a && swapon -a now? (briefly forces swap reclaim)"; then
+      sudo swapoff -a && sudo swapon -a && ok "swap cycled"
+    fi
+  fi
+else
+  ok "Swap usage normal."
+fi
+
+section "🐳 Container runtime"
+if pgrep -q dockerd; then
+  ok "Docker running"
+  docker stats --no-stream --format "  {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}" 2>/dev/null | head -8
+fi
+
+echo ""
+sleep 3
+TEMP_AFTER=$(get_temp)
+LOAD_AFTER=$(get_load)
+SWAP_AFTER=$(get_swap)
+MEM_PCT_AFTER=$(get_mem_pct)
+
+section "📈 BEFORE → AFTER"
+printf "  CPU temp : %s°C → %s°C\n" "${TEMP_BEFORE:-?}" "${TEMP_AFTER:-?}"
+printf "  Load     : %s → %s\n" "$LOAD_BEFORE" "$LOAD_AFTER"
+printf "  Swap     : %s → %s\n" "$SWAP_BEFORE" "$SWAP_AFTER"
+printf "  Mem      : %s%% → %s%%\n" "$MEM_PCT_BEFORE" "$MEM_PCT_AFTER"
+
+if has notify-send; then
+  notify-send "❄️ Cooldown done" "Temp: ${TEMP_BEFORE:-?}°C → ${TEMP_AFTER:-?}°C | Mem: ${MEM_PCT_BEFORE}% → ${MEM_PCT_AFTER}%"
+fi
+
+echo ""
+if [ "$USE_LOLCAT" = 1 ]; then
+  echo "Done." | lolcat
+else
+  echo "${C_GRN}${C_BOLD}Done.${C_RST}"
+fi

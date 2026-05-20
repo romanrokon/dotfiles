@@ -19,3 +19,11 @@ snapd
 appimagelauncher
 cloudflare-warp
 mysql-server
+aria2
+gum
+lolcat
+figlet
+cbonsai
+jq
+lm-sensors
+libnotify-bin

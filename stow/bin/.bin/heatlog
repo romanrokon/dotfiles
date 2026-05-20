@@ -1,7 +1,12 @@
 #!/bin/bash
 # Log temp + mem pressure, notify on threshold breach.
-# Usage: ./heatlog.sh [interval_seconds] [temp_threshold_C] [swap_threshold_GB]
+# Usage: heatlog [interval_seconds] [temp_threshold_C] [swap_threshold_GB]
 # Stop: Ctrl+C
+
+if [ "$(uname)" = "Linux" ]; then
+  exec "$(dirname "$(readlink -f "$0")")/heatlog-linux" "$@"
+fi
+
 
 INTERVAL=${1:-30}
 TEMP_MAX=${2:-90}

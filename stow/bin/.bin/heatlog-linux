@@ -1,0 +1,70 @@
+#!/bin/bash
+# Linux heatlog — samples temp/mem/swap/fan, notify-send on threshold breach.
+# Usage: heatlog [interval_seconds] [temp_threshold_C] [swap_threshold_GB]
+# Stop: Ctrl+C
+
+INTERVAL=${1:-30}
+TEMP_MAX=${2:-90}
+SWAP_MAX=${3:-5}
+
+LOG="$HOME/.heatlog.csv"
+ALERT_COOLDOWN=300
+LAST_TEMP_ALERT=0
+LAST_SWAP_ALERT=0
+
+notify() {
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send -u "${3:-normal}" "$1" "$2"
+  fi
+}
+
+[ ! -f "$LOG" ] && echo "timestamp,cpu_temp_C,fan_rpm,mem_used_GB,swap_GB,mem_pct,top_cpu_proc,top_mem_proc" > "$LOG"
+
+echo "Logging to $LOG every ${INTERVAL}s. Temp alert>${TEMP_MAX}C, swap alert>${SWAP_MAX}GB."
+
+while true; do
+  TS=$(date '+%Y-%m-%d %H:%M:%S')
+
+  # CPU temp — highest core via sensors -u
+  CPU_TEMP=""
+  if command -v sensors >/dev/null 2>&1; then
+    CPU_TEMP=$(sensors -u 2>/dev/null | awk -F': ' '/_input/ && /temp/ {print $2}' | sort -rn | head -1 | awk '{printf "%.0f", $1}')
+  fi
+  [ -z "$CPU_TEMP" ] && CPU_TEMP=0
+
+  # Fan RPM — first fan reading
+  FAN_RPM=""
+  if command -v sensors >/dev/null 2>&1; then
+    FAN_RPM=$(sensors -u 2>/dev/null | awk -F': ' '/fan/ && /_input/ {print $2; exit}' | awk '{printf "%.0f", $1}')
+  fi
+  [ -z "$FAN_RPM" ] && FAN_RPM=0
+
+  # Memory from /proc/meminfo (KB → GB)
+  MEM_USED_GB=$(awk '/MemTotal/{t=$2} /MemAvailable/{a=$2} END{printf "%.2f", (t-a)/1048576}' /proc/meminfo)
+  MEM_PCT=$(awk '/MemTotal/{t=$2} /MemAvailable/{a=$2} END{printf "%.0f", (t-a)*100/t}' /proc/meminfo)
+  SWAP_GB=$(awk '/SwapTotal/{t=$2} /SwapFree/{f=$2} END{printf "%.2f", (t-f)/1048576}' /proc/meminfo)
+
+  TOP_CPU=$(ps -eo comm,%cpu --sort=-%cpu | sed -n '2p' | awk '{print $1":"$2"%"}')
+  TOP_MEM=$(ps -eo comm,rss --sort=-rss | sed -n '2p' | awk '{print $1":"int($2/1024)"MB"}')
+
+  echo "$TS,$CPU_TEMP,$FAN_RPM,$MEM_USED_GB,$SWAP_GB,$MEM_PCT,$TOP_CPU,$TOP_MEM" >> "$LOG"
+
+  printf "%s  CPU:%s°C Fan:%s RPM  Mem:%sG (%s%%) Swap:%sG  Top:%s\n" \
+    "$TS" "$CPU_TEMP" "$FAN_RPM" "$MEM_USED_GB" "$MEM_PCT" "$SWAP_GB" "$TOP_CPU"
+
+  NOW=$(date +%s)
+  if [ -n "$CPU_TEMP" ] && (( $(echo "$CPU_TEMP > $TEMP_MAX" | bc -l) )); then
+    if (( NOW - LAST_TEMP_ALERT > ALERT_COOLDOWN )); then
+      notify "🔥 CPU Hot: ${CPU_TEMP}°C" "Top: $TOP_CPU | Fan: ${FAN_RPM} RPM" critical
+      LAST_TEMP_ALERT=$NOW
+    fi
+  fi
+  if (( $(echo "$SWAP_GB > $SWAP_MAX" | bc -l) )); then
+    if (( NOW - LAST_SWAP_ALERT > ALERT_COOLDOWN )); then
+      notify "💾 Swap High: ${SWAP_GB}GB" "Top mem: $TOP_MEM" critical
+      LAST_SWAP_ALERT=$NOW
+    fi
+  fi
+
+  sleep "$INTERVAL"
+done

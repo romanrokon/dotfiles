@@ -1,6 +1,11 @@
 #!/bin/bash
-# Mac cooldown — kills runaway daemons, purges cache, shows swap owners.
-# Usage: ./cooldown.sh [--aggressive] [--dry-run] [--no-color]
+# Cooldown — kills runaway daemons, purges cache, shows swap owners.
+# Mac path below. Linux dispatched to cooldown-linux.
+# Usage: cooldown [--aggressive] [--dry-run] [--no-color]
+
+if [ "$(uname)" = "Linux" ]; then
+  exec "$(dirname "$(readlink -f "$0")")/cooldown-linux" "$@"
+fi
 
 AGGRESSIVE=0
 DRY=0

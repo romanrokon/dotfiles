@@ -7,17 +7,24 @@ NUM_FILES="$2"
 FILEPATH="$3"
 FILENAME=$(basename "$FILEPATH")
 
-# Empty filename => no file (e.g. metadata-only torrent). Skip.
 [ -z "$FILENAME" ] && exit 0
 
-# Detect success vs error via file existence + size
 if [ -f "$FILEPATH" ] && [ -s "$FILEPATH" ]; then
   SIZE=$(du -h "$FILEPATH" 2>/dev/null | cut -f1)
   TITLE="✅ Download complete"
   MSG="$FILENAME ($SIZE)"
+  URGENCY="normal"
 else
   TITLE="❌ Download failed"
   MSG="$FILENAME"
+  URGENCY="critical"
 fi
 
-osascript -e "display notification \"$MSG\" with title \"$TITLE\" sound name \"Glass\""
+case "$(uname)" in
+  Darwin)
+    osascript -e "display notification \"$MSG\" with title \"$TITLE\" sound name \"Glass\""
+    ;;
+  Linux)
+    notify-send -u "$URGENCY" "$TITLE" "$MSG"
+    ;;
+esac
