@@ -1,23 +1,57 @@
 #!/bin/bash
-# @ AI Context: Git wrapper script to automate .todo.md sync for worktrees.
-# This script intercepts 'git worktree add' and copies your local todos.
+# @ AI Context: Git wrapper that adds two automations on top of plain git:
+#   1. After `git worktree add`, copy local .todo.md into the new worktree.
+#   2. After `git clone`, register the new repo with `git maintenance` so
+#      hourly prefetch keeps `git status` / lazygit fresh without manual fetch.
+# Both are no-ops if the underlying real-git invocation fails.
 
 REAL_GIT="/usr/bin/git"
 if [ ! -f "$REAL_GIT" ]; then REAL_GIT=$(which -a git | grep -v "$HOME/.bin/git" | head -n 1); fi
 
 # Handle worktree add
 if [ "$1" = "worktree" ] && [ "$2" = "add" ]; then
-    # Run the real command first
     "$REAL_GIT" "$@"
     EXIT_CODE=$?
-    
-    # If successful, copy .todo.md to the new worktree
+
+    # Copy .todo.md into the new worktree on success.
+    # Worktrees share the parent repo's .git, so no extra maintenance reg needed.
     if [ $EXIT_CODE -eq 0 ]; then
-        # The last argument is usually the path
         NEW_WT_PATH="${@: -1}"
         if [ -f ".todo.md" ] && [ -d "$NEW_WT_PATH" ]; then
             echo "📝 Syncing .todo.md to new worktree..."
             cp ".todo.md" "$NEW_WT_PATH/.todo.md"
+        fi
+    fi
+    exit $EXIT_CODE
+fi
+
+# Handle clone — auto-register with git maintenance so the new repo gets
+# hourly background prefetches via launchd.
+if [ "$1" = "clone" ]; then
+    "$REAL_GIT" "$@"
+    EXIT_CODE=$?
+
+    if [ $EXIT_CODE -eq 0 ]; then
+        # Derive the clone target dir. Git places the clone in either:
+        #   1. The last positional arg, if it's a path (not starting with - and not the URL)
+        #   2. basename(<url>) stripped of .git
+        # We resolve by re-walking the args.
+        TARGET=""
+        URL=""
+        for a in "$@"; do
+            case "$a" in
+                -*) ;;                          # flag — skip
+                clone) ;;                       # subcommand — skip
+                *://*|*@*:*|/*|.*) [ -z "$URL" ] && URL="$a" ;;  # URL or path-source
+                *) TARGET="$a" ;;
+            esac
+        done
+        if [ -z "$TARGET" ] && [ -n "$URL" ]; then
+            TARGET=$(basename "$URL" .git)
+        fi
+        if [ -d "$TARGET/.git" ] || [ -f "$TARGET/.git" ]; then
+            (cd "$TARGET" && "$REAL_GIT" maintenance start >/dev/null 2>&1) \
+                && echo "🔧 git maintenance enabled for $TARGET"
         fi
     fi
     exit $EXIT_CODE

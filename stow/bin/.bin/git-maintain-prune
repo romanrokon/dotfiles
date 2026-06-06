@@ -1,0 +1,64 @@
+#!/bin/bash
+# @ AI Context: List every repo registered with `git maintenance` and
+# offer to unregister entries whose path no longer exists on disk.
+# Run interactively or with --yes to auto-prune without prompting.
+
+set -o pipefail
+
+REAL_GIT="/usr/bin/git"
+if [ ! -f "$REAL_GIT" ]; then REAL_GIT=$(which -a git | grep -v "$HOME/.bin/git" | head -n 1); fi
+
+YES=0
+[ "${1:-}" = "--yes" ] && YES=1
+
+# Portable replacement for bash 4's `mapfile` (macOS ships bash 3.2).
+REPOS=()
+while IFS= read -r _line; do
+    [ -n "$_line" ] && REPOS+=("$_line")
+done < <("$REAL_GIT" config --global --get-all maintenance.repo 2>/dev/null)
+
+if [ "${#REPOS[@]}" -eq 0 ]; then
+    echo "No repos registered with git maintenance."
+    exit 0
+fi
+
+LIVE=()
+STALE=()
+for r in "${REPOS[@]}"; do
+    # `maintenance.repo` stores the .git common dir. Parent must exist + look
+    # like a git dir (file or dir at $r works).
+    if [ -e "$r" ]; then
+        LIVE+=("$r")
+    else
+        STALE+=("$r")
+    fi
+done
+
+echo "✓ Live   : ${#LIVE[@]}"
+echo "✗ Stale  : ${#STALE[@]}"
+echo
+
+if [ "${#STALE[@]}" -eq 0 ]; then
+    echo "Nothing to prune."
+    exit 0
+fi
+
+echo "Stale entries (path missing on disk):"
+for r in "${STALE[@]}"; do echo "  $r"; done
+echo
+
+if [ "$YES" -ne 1 ]; then
+    printf "Unregister all %d stale paths? [y/N] " "${#STALE[@]}"
+    read -r ANSWER
+    case "$ANSWER" in
+        y|Y|yes|YES) ;;
+        *) echo "Aborted."; exit 0 ;;
+    esac
+fi
+
+for r in "${STALE[@]}"; do
+    "$REAL_GIT" config --global --unset-all maintenance.repo "^$(printf '%s' "$r" | sed 's/[][\.*^$()+?{}|/]/\\&/g')\$"
+    echo "  unregistered: $r"
+done
+
+echo "Done."

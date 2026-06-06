@@ -14,6 +14,12 @@ git:
       pager: delta --paging=never --side-by-side --line-numbers
   autoRefresh: true
   autoFetch: true
+refresher:
+  # Background fetch every 30s while lazygit is open. Complements
+  # `git maintenance prefetch` (hourly via launchd) which keeps things
+  # warm even when lazygit is closed.
+  fetchInterval: 30
+  refreshInterval: 10
 customCommands:
   - key: "P"
     context: "global"

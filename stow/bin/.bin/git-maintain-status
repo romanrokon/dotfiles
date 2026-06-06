@@ -1,0 +1,78 @@
+#!/bin/bash
+# @ AI Context: One-screen overview of git maintenance state on this Mac.
+# Shows every registered repo, whether the path still exists, when the
+# last prefetch fired, and whether the launchd job is loaded.
+#
+# Output columns: STATUS  LAST-FETCH (relative)  PATH
+#   ✓ = live, fetched recently
+#   ⚠ = live, no fetch ever recorded
+#   ✗ = stale (path gone)
+
+set -o pipefail
+
+REAL_GIT="/usr/bin/git"
+if [ ! -f "$REAL_GIT" ]; then REAL_GIT=$(which -a git | grep -v "$HOME/.bin/git" | head -n 1); fi
+
+# Portable replacement for bash 4's `mapfile` (macOS ships bash 3.2).
+REPOS=()
+while IFS= read -r _line; do
+    [ -n "$_line" ] && REPOS+=("$_line")
+done < <("$REAL_GIT" config --global --get-all maintenance.repo 2>/dev/null)
+
+# Launchd job(s) — git installs one or two depending on version
+LAUNCHD_JOBS=$(launchctl list 2>/dev/null | awk '/org\.git-scm\.git\./ {print $3}' | sort -u)
+
+echo "── git maintenance ──"
+if [ -z "$LAUNCHD_JOBS" ]; then
+    echo "  launchd: NO active jobs — background fetch is OFF"
+else
+    echo "  launchd jobs:"
+    while IFS= read -r j; do [ -n "$j" ] && echo "    • $j"; done <<< "$LAUNCHD_JOBS"
+fi
+echo "  registered repos: ${#REPOS[@]}"
+echo
+
+if [ "${#REPOS[@]}" -eq 0 ]; then
+    echo "No repos registered. Run 'git maintenance start' inside a repo to enable."
+    exit 0
+fi
+
+# Try to find each repo's most recent fetch by mtime of FETCH_HEAD.
+# A missing FETCH_HEAD just means "never fetched after registration".
+now=$(date +%s)
+human_age() {
+    local secs=$1
+    if [ "$secs" -lt 0 ]; then echo "future"; return; fi
+    if [ "$secs" -lt 60 ]; then echo "${secs}s ago"; return; fi
+    if [ "$secs" -lt 3600 ]; then echo "$((secs / 60))m ago"; return; fi
+    if [ "$secs" -lt 86400 ]; then echo "$((secs / 3600))h ago"; return; fi
+    echo "$((secs / 86400))d ago"
+}
+
+LIVE_COUNT=0
+STALE_COUNT=0
+for r in "${REPOS[@]}"; do
+    if [ ! -e "$r" ]; then
+        STALE_COUNT=$((STALE_COUNT + 1))
+        printf "  %s %-14s %s\n" "✗" "—" "$r"
+        continue
+    fi
+    LIVE_COUNT=$((LIVE_COUNT + 1))
+    # `maintenance.repo` stores the working-tree root; FETCH_HEAD lives in .git.
+    # Worktrees use a per-worktree .git file pointing into the common dir.
+    git_dir=$("$REAL_GIT" -C "$r" rev-parse --git-dir 2>/dev/null)
+    [ -n "$git_dir" ] && [ "${git_dir:0:1}" != "/" ] && git_dir="$r/$git_dir"
+    fh=""
+    [ -n "$git_dir" ] && [ -f "$git_dir/FETCH_HEAD" ] && fh="$git_dir/FETCH_HEAD"
+    if [ -n "$fh" ]; then
+        mtime=$(stat -f %m "$fh" 2>/dev/null || stat -c %Y "$fh" 2>/dev/null)
+        age=$((now - mtime))
+        printf "  %s %-14s %s\n" "✓" "$(human_age $age)" "$r"
+    else
+        printf "  %s %-14s %s\n" "⚠" "never" "$r"
+    fi
+done
+
+echo
+echo "Summary: $LIVE_COUNT live, $STALE_COUNT stale"
+[ "$STALE_COUNT" -gt 0 ] && echo "Tip: run 'git-maintain-prune' to clean up."
