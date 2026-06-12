@@ -15,19 +15,30 @@ TS=$(date '+%Y-%m-%d_%H-%M-%S')
 LOCAL_FILE="$BACKUP_DIR/pihole-${TS}.zip"
 
 echo "→ Generating backup on $SSH_HOST..."
-REMOTE_FILE=$(ssh -o BatchMode=yes "$SSH_HOST" 'cd /tmp && pihole-FTL --teleporter' 2>/dev/null | tail -1)
+SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=10 -o ServerAliveInterval=5)
+SSH_ERR=$(mktemp -t pihole-backup-ssh.XXXXXX)
+trap 'rm -f "$SSH_ERR"' EXIT
 
-if [ -z "$REMOTE_FILE" ]; then
-  echo "✗ Teleporter produced no output filename" >&2
+if ! REMOTE_FILE=$(ssh "${SSH_OPTS[@]}" "$SSH_HOST" 'cd /tmp && pihole-FTL --teleporter' 2>"$SSH_ERR" | tail -1); then
+  echo "✗ ssh failed (rc=$?): $(cat "$SSH_ERR")" >&2
+  exit 1
+fi
+
+if [ -z "$REMOTE_FILE" ] || ! [[ "$REMOTE_FILE" =~ \.zip$ ]]; then
+  echo "✗ Teleporter produced no zip (got: '$REMOTE_FILE'). ssh stderr: $(cat "$SSH_ERR")" >&2
   exit 1
 fi
 
 echo "→ Fetching /tmp/$REMOTE_FILE → $LOCAL_FILE"
 # Stream over ssh stdout — avoids needing sftp-server on the pi
-ssh -o BatchMode=yes "$SSH_HOST" "cat /tmp/$REMOTE_FILE" > "$LOCAL_FILE"
+if ! ssh "${SSH_OPTS[@]}" "$SSH_HOST" "cat /tmp/$REMOTE_FILE" > "$LOCAL_FILE"; then
+  echo "✗ fetch failed (rc=$?). Removing partial file." >&2
+  rm -f "$LOCAL_FILE"
+  exit 1
+fi
 
 # Clean up remote temp
-ssh -o BatchMode=yes "$SSH_HOST" "rm -f /tmp/$REMOTE_FILE"
+ssh "${SSH_OPTS[@]}" "$SSH_HOST" "rm -f /tmp/$REMOTE_FILE" || true
 
 SIZE=$(du -h "$LOCAL_FILE" | cut -f1)
 echo "✓ Saved $LOCAL_FILE ($SIZE)"
