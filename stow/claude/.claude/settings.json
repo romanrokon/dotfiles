@@ -139,7 +139,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "input=$(cat); msg=$(echo \"$input\" | jq -r '.message // empty'); ws=$(echo \"$input\" | jq -r '.cwd // empty' | xargs -I{} basename {}); [ -n \"$msg\" ] && { afplay /System/Library/Sounds/Glass.aiff & say \"$ws: $msg\" & terminal-notifier -title \"Claude — $ws\" -message \"$msg\" -group claude-pause -ignoreDoNotDisturb; } 2>/dev/null || true",
+            "command": "input=$(cat); msg=$(echo \"$input\" | jq -r '.message // empty'); ws=$(echo \"$input\" | jq -r '.cwd // empty' | xargs -I{} basename {}); clean=$(echo \"$msg\" | sed -E 's/^[Cc]laude[[:space:]]+//'); [ -n \"$msg\" ] && { afplay /System/Library/Sounds/Glass.aiff & say \"$ws: $clean\" & terminal-notifier -title \"$ws\" -message \"$clean\" -group claude-pause -ignoreDoNotDisturb; } 2>/dev/null || true",
             "async": true
           }
         ]
