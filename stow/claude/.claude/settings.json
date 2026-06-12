@@ -66,6 +66,12 @@
       "mcp__plugin_linear_linear__list_issue_statuses",
       "mcp__plugin_linear_linear__get_issue_status",
       "mcp__plugin_linear_linear__search_documentation",
+      "mcp__plugin_linear_linear__save_issue",
+      "mcp__plugin_linear_linear__save_comment",
+      "Bash(git remote show:*)",
+      "Bash(git worktree add:*)",
+      "Bash(git worktree list:*)",
+      "Bash(git worktree remove:*)",
       "mcp__sentry__find_organizations",
       "mcp__sentry__find_projects",
       "mcp__sentry__search_issues",
@@ -122,7 +128,7 @@
           },
           {
             "type": "command",
-            "command": "jq -r '.last_assistant_message // empty' | perl -0777 -pe 's/```.*?```//gs' | say; terminal-notifier -remove claude-pause 2>/dev/null || true",
+            "command": "terminal-notifier -remove claude-pause 2>/dev/null || true",
             "async": true
           }
         ]
@@ -200,7 +206,7 @@
       }
     }
   },
-  "effortLevel": "low",
+  "effortLevel": "high",
   "voice": {
     "enabled": false,
     "mode": "hold"
@@ -212,6 +218,6 @@
   "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
-  "voiceEnabled": false,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "voiceEnabled": false
 }
