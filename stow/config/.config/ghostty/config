@@ -23,7 +23,7 @@ window-padding-y = 5
 
 # Extracted from Transparency: 0.30 and Blur Radius: ~30
 # Ghostty uses opacity (1 - 0.3 = 0.7) and native macOS blur
-background-opacity = 0.7
+background-opacity = 0.9
 background-blur = true
 
 # --- Colors ---
@@ -37,3 +37,30 @@ cursor-style-blink = true
 # Selection color extracted from (R: 0.70, G: 0.83, B: 1.0)
 selection-background = #b5d5ff
 selection-foreground = #000000
+
+# --- Alt key (for tmux no-prefix bindings) ---
+# Option as a real Alt modifier — sends ESC+key. Required so tmux's `bind -n M-X`
+# bindings receive the keystroke. Affects both left and right Option.
+macos-option-as-alt = true
+
+# --- Cmd+Shift forwarding → tmux Alt bindings ---
+# These mirror the Alt+key bindings in ~/.tmux.conf so you can use a thumb-rest
+# Cmd+Shift chord on Mac. Cmd is owned by the terminal app, so we map it to the
+# same ESC+key that Alt would send; tmux can't tell the difference.
+keybind = cmd+shift+h=text:\x1bh
+keybind = cmd+shift+j=text:\x1bj
+keybind = cmd+shift+k=text:\x1bk
+keybind = cmd+shift+l=text:\x1bl
+keybind = cmd+shift+n=text:\x1bn
+keybind = cmd+shift+p=text:\x1bp
+keybind = cmd+shift+d=text:\x1bd
+keybind = cmd+shift+r=text:\x1br
+keybind = cmd+shift+1=text:\x1b1
+keybind = cmd+shift+2=text:\x1b2
+keybind = cmd+shift+3=text:\x1b3
+keybind = cmd+shift+4=text:\x1b4
+keybind = cmd+shift+5=text:\x1b5
+keybind = cmd+shift+6=text:\x1b6
+keybind = cmd+shift+7=text:\x1b7
+keybind = cmd+shift+8=text:\x1b8
+keybind = cmd+shift+9=text:\x1b9

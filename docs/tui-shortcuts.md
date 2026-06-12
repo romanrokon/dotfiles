@@ -92,6 +92,66 @@ Replaces zsh's native tab completion. Just hit `Tab` after any command + a space
 | `Cmd+[` / `Cmd+]` | Previous / next split |
 | `Cmd+Plus` / `Cmd+-` | Font bigger / smaller |
 | `Cmd+K` | Clear scrollback |
+| `Cmd+J` | Toggle quick terminal (Quake mode) |
+
+## tmux
+
+Prefix is `Ctrl+A` (also `prefix a`). Most common ops are also bound **no-prefix**
+via `Alt+<key>` — works everywhere, including over SSH from any terminal.
+
+### No-prefix one-shots
+
+| Keys | Action |
+|---|---|
+| `Alt+h` / `Alt+j` / `Alt+k` / `Alt+l` | Move between panes (left/down/up/right) |
+| `Alt+1` … `Alt+9` | Jump to window N |
+| `Alt+n` / `Alt+p` | Next / previous window |
+| `Alt+Tab` | Last window |
+| `Alt+d` | Detach session |
+| `Alt+r` | Rename current window |
+| `Alt+R` | Reload `~/.tmux.conf` |
+
+### macOS sugar via Ghostty
+
+Cmd+Shift chords forward to the same Alt escape sequences. Only works in Ghostty
+on Mac; the Alt versions above work everywhere.
+
+| Keys | Mirrors |
+|---|---|
+| `Cmd+Shift+H/J/K/L` | `Alt+h/j/k/l` |
+| `Cmd+Shift+1` … `Cmd+Shift+9` | `Alt+1` … `Alt+9` |
+| `Cmd+Shift+N` / `Cmd+Shift+P` | `Alt+n` / `Alt+p` |
+| `Cmd+Shift+D` | `Alt+d` (detach) |
+| `Cmd+Shift+R` | `Alt+r` (rename window) |
+
+### Prefix-driven (`Ctrl+A` then …)
+
+Less common ops kept on prefix so the alphabet isn't fully claimed for tmux.
+
+| Keys | Action |
+|---|---|
+| `Ctrl+A \|` | Split right (keeps current dir) |
+| `Ctrl+A -` | Split down (keeps current dir) |
+| `Ctrl+A c` | New window |
+| `Ctrl+A x` | Kill current pane (asks) |
+| `Ctrl+A H/J/K/L` | Resize pane left/down/up/right |
+| `Ctrl+A [` | Enter copy mode (vi keys; `v` start sel, `y` yank, `q` quit) |
+| `Ctrl+A ,` | Rename window (prompt) |
+| `Ctrl+A ?` | List all keybinds |
+| `Ctrl+A s` | Session picker |
+| `Ctrl+A $` | Rename session |
+| `Ctrl+A d` | Detach |
+
+### Session basics (outside tmux)
+
+| Cmd | What |
+|---|---|
+| `tmux new -s name` | New named session |
+| `tmux ls` | List sessions |
+| `tmux a -t name` | Attach to `name` |
+| `tmux a -t :` | Interactive session picker |
+| `tmux kill-session -t name` | Kill one session |
+| `tmux kill-server` | Kill all sessions |
 
 ## Lazygit (custom keybinds covered by its built-in `?` help)
 
