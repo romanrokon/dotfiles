@@ -95,6 +95,50 @@ log_init() {
 log_info() { echo "[INFO  $(date +%H:%M:%S)] $*" >> "$LOG_FILE"; }
 log_err()  { echo "[ERROR $(date +%H:%M:%S)] $*" | tee -a "$LOG_FILE" >&2; }
 
+# @ AI Context: sudo wrapper. Drops 'sudo' when already root (minimal containers
+# like debian:12 ship with no sudo). Steps should use `_sudo apt ...` instead of
+# `sudo apt ...` so they work both as a real user and inside a root-only image.
+if [ "$(id -u)" = "0" ]; then
+    _sudo() { "$@"; }
+else
+    _sudo() { sudo "$@"; }
+fi
+
+# @ AI Context: Spinner for long-running commands. Renders braille frames on
+# the same line while a backgrounded command runs; prints a final ✓/✗ + label.
+# Usage:  _spin "Installing fail2ban" _sudo apt install -y fail2ban
+_spin() {
+    local label=$1; shift
+    # Skip animation when stdout isn't a TTY (logs, CI).
+    if [ ! -t 1 ]; then
+        printf "  → %s ... " "$label"
+        if "$@" >> "$LOG_FILE" 2>&1; then printf "ok\n"; return 0
+        else printf "fail (see $LOG_FILE)\n"; return 1; fi
+    fi
+
+    "$@" >> "$LOG_FILE" 2>&1 &
+    local pid=$! rc
+    local frames='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+    local i=0
+    local start_ts=$(date +%s)
+    while kill -0 "$pid" 2>/dev/null; do
+        local elapsed=$(( $(date +%s) - start_ts ))
+        printf "\r  %s %s  (%ds)   " \
+            "${frames:$((i % ${#frames})):1}" \
+            "$label" "$elapsed"
+        i=$((i + 1))
+        sleep 0.1
+    done
+    wait "$pid"; rc=$?
+    local elapsed=$(( $(date +%s) - start_ts ))
+    if [ "$rc" -eq 0 ]; then
+        printf "\r  ✓ %s  (%ds)         \n" "$label" "$elapsed"
+    else
+        printf "\r  ✗ %s  (%ds, see $LOG_FILE)\n" "$label" "$elapsed"
+    fi
+    return $rc
+}
+
 # @ AI Context: TUI helpers around whiptail. Fall back to plain prompts if
 # whiptail not yet installed (only true during very first prereq step).
 tui_available() { command -v whiptail >/dev/null 2>&1; }

@@ -61,6 +61,7 @@ STEPS=(
     "gh_auth|Authenticate with GitHub (gh auth login)|04-gh-auth.sh"
     "private_repo|Clone + stow private dotfiles repo|05-private-repo.sh"
     "os_tweaks|Apply OS tweaks (defaults / sysctl)|06-os-tweaks.sh"
+    "server_harden|Server hardening (fail2ban + SSH + cron) [server profile only]|06b-server-hardening.sh"
     "runtimes|Install NVM + Cargo apps|07-runtimes.sh"
     "wait_bg|Wait for background apps install to finish|08-wait-bg.sh"
     "summary|Final summary|09-summary.sh"

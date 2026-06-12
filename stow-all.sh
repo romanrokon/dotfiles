@@ -18,15 +18,38 @@ if ! command -v stow &> /dev/null; then
     exit 1
 fi
 
-echo "Automatically stowing all packages from $STOW_DIR..."
+# @ AI Context: Profile-aware stow. If SETUP_PROFILE is set and a matching
+# profile file exists, source it and iterate only SERVER_STOW_PACKAGES (or
+# equivalent). Otherwise fall back to "stow everything under stow/" behavior.
+PROFILE_FILE="$DOTFILES_DIR/setup/profiles/${SETUP_PROFILE:-}.sh"
+if [ -n "${SETUP_PROFILE:-}" ] && [ -f "$PROFILE_FILE" ]; then
+    # shellcheck source=/dev/null
+    source "$PROFILE_FILE"
+    echo "Profile: $SETUP_PROFILE — stowing whitelisted packages only."
+fi
+
+echo "Automatically stowing packages from $STOW_DIR..."
 
 cd "$DOTFILES_DIR" || exit
 
-# Iterate through all directories in stow/
-for pkg in stow/*/; do
+# Build list of packages to stow.
+if [ "${SETUP_PROFILE:-}" = "server" ] && [ ${#SERVER_STOW_PACKAGES[@]} -gt 0 ]; then
+    pkg_list=("${SERVER_STOW_PACKAGES[@]/#/stow/}")
+    # Append trailing slash to mimic the glob form below.
+    pkg_list=("${pkg_list[@]/%//}")
+else
+    pkg_list=(stow/*/)
+fi
+
+# Iterate selected packages
+for pkg in "${pkg_list[@]}"; do
     # Remove trailing slash and 'stow/' prefix to get package name
     pkg_name=$(basename "$pkg")
-    
+
+    # Skip if the package directory does not exist (server whitelist may
+    # reference a package that hasn't been created yet).
+    [ -d "$STOW_DIR/$pkg_name" ] || { echo "Skipping missing package: $pkg_name"; continue; }
+
     echo "Stowing: $pkg_name"
     
     # Pro-tip: Before stowing, we look for top-level hidden directories in the package

@@ -3,6 +3,12 @@
 # in apps/cargo.txt. Cargo step is skipped if rustup/cargo isn't installed.
 
 step_runtimes() {
+    # Server profile: no NVM / cargo. Pi-hole SBCs don't need a node toolchain.
+    if [ "${SETUP_PROFILE:-}" = "server" ]; then
+        log_info "Server profile — skipping NVM + cargo installs."
+        return 0
+    fi
+
     if [ ! -d "$HOME/.nvm" ]; then
         log_info "Installing NVM..."
         PROFILE=/dev/null bash -c \

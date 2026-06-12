@@ -1,0 +1,18 @@
+#!/bin/bash
+# Pi-hole Teleporter backup — runs ON the pihole box itself via /etc/cron.d.
+# Installed by the server-hardening step when pihole-FTL is present.
+# Outputs to /var/backups/pihole, keeps last 14.
+
+set -euo pipefail
+
+DIR="${PIHOLE_BACKUP_DIR:-/var/backups/pihole}"
+KEEP="${PIHOLE_BACKUP_KEEP:-14}"
+
+mkdir -p "$DIR"
+cd "$DIR"
+
+# pihole-FTL --teleporter writes pi-hole_*_teleporter_*.zip into cwd.
+pihole-FTL --teleporter >/dev/null
+
+# Rotate — keep the newest $KEEP zips.
+ls -1t pi-hole_*.zip 2>/dev/null | tail -n +"$((KEEP + 1))" | xargs -r rm -f

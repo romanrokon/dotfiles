@@ -15,6 +15,8 @@ AUTO_LS_COMMANDS=(ll git)
 # Lazy-load NVM for better startup performance
 # @ AI Context: These wrappers are replaced by the real NVM script when called.
 # We unset existing aliases first to prevent Zsh parse errors.
+# Skipped on server profile (no node/nvm on SBC).
+if [[ "${SETUP_PROFILE:-desktop}" != "server" ]]; then
 unalias nvm node npm pnpm yarn 2>/dev/null
 
 nvm() {
@@ -84,9 +86,11 @@ load-nvmrc() {
 add-zsh-hook chpwd load-nvmrc
 # Run once on startup in case we start in a directory with .nvmrc
 load-nvmrc
+fi  # end !server NVM block
 
-# @ AI Context: Gemini Chat Workspace Command
-# Usage: pa | ga | gemini-chat
+# @ AI Context: Gemini Chat Workspace Command — desktop-only.
+# Usage: pa | gc | gemini-chat
+if [[ "${SETUP_PROFILE:-desktop}" != "server" ]]; then
 # Sets up a workspace and starts Gemini in Sandbox mode.
 gemini-chat() {
     local workspace="$HOME/.gemini-chat"
@@ -99,6 +103,7 @@ gemini-chat() {
 }
 
 alias pa='gemini-chat'
+fi  # end !server gemini block
 
 # @ AI Context: Automate worktree creation and sync globally ignored files
 gw() {

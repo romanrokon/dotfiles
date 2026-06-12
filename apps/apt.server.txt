@@ -1,0 +1,54 @@
+# Server / SBC apt manifest. Installed per-package (tolerant of missing
+# packages — see _apt_install_tolerant in 03-apps-bg.sh), so it's fine if a
+# package isn't in this distro's repos.
+#
+# Notes on cross-distro availability:
+#   eza      — Debian 13+ / Ubuntu 24.04+ (not in Debian 12 main). Install via
+#              cargo or upstream .deb if missing — exa is the older fork.
+#   lazygit  — not in Debian main; Ubuntu PPA or Go install required.
+#   bat      — binary is 'batcat' on Debian/Ubuntu (aliased in zsh).
+#   fd-find  — binary is 'fdfind' on Debian/Ubuntu (aliased in zsh).
+
+# Essentials
+zsh
+tmux
+git
+vim
+htop
+curl
+wget
+rsync
+dnsutils
+bc
+jq
+stow
+locales         # UTF-8 locale (Debian minimal has none — breaks p10k glyphs)
+ncurses-term    # tmux-256color terminfo entry
+
+# Modern CLI
+fzf
+fd-find
+ripgrep
+bat
+zoxide
+ncdu
+trash-cli
+
+# Distro-conditional (may be absent on Debian 12) — install loop tolerates 404.
+# Falls back to upstream GitHub release if apt couldn't install
+# (see _install_eza_from_release / _install_lazygit_from_release in 03-apps-bg.sh).
+eza
+lazygit
+
+# System health
+lm-sensors
+smartmontools
+iotop
+
+# Security
+unattended-upgrades
+fail2ban
+
+# Optional
+aria2
+lnav

@@ -28,10 +28,16 @@ _install_mac_prereqs() {
 }
 
 _install_linux_prereqs() {
-    local pkgs=(git gh zsh stow whiptail curl wget unzip build-essential python3-pip)
-    log_info "apt update + install: ${pkgs[*]}"
-    sudo apt update -y >> "$LOG_FILE" 2>&1 || return 1
-    sudo apt install -y "${pkgs[@]}" >> "$LOG_FILE" 2>&1 || return 1
+    local pkgs
+    if [ "${SETUP_PROFILE:-}" = "server" ]; then
+        # Minimal — no whiptail (use plain prompts), no gh (deferred & optional),
+        # no build-essential / python3-pip (no language runtimes on SBC).
+        pkgs=(git zsh stow curl wget unzip)
+    else
+        pkgs=(git gh zsh stow whiptail curl wget unzip build-essential python3-pip)
+    fi
+    _spin "apt update" _sudo apt update -y || return 1
+    _spin "apt install ${pkgs[*]}" _sudo apt install -y "${pkgs[@]}" || return 1
 }
 
 step_prereqs() {

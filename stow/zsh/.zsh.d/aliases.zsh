@@ -1,4 +1,5 @@
-alias cd='z'
+# zoxide itself owns `cd` via `zoxide init zsh --cmd cd` in .zshrc — no alias needed.
+# `cdi` (interactive zoxide picker) and the bare `cd -` / `cd ..` still work.
 [ -d /Volumes/Work/projects ] && alias pro='cd /Volumes/Work/projects'
 alias tree='eza --tree'
 alias find='fd --'
@@ -7,11 +8,20 @@ alias ls='eza --icons --group-directories-first'
 alias ll='ls -lh --octal-permissions --git'
 alias la='ll -a'
 alias lr='ll -R'
-alias trash='trash -s -v' # macOS 15.0 addition, moves to users trash, stop on error, verbose
-alias rm='trash -s -v' # always use trash for rm
+# Cross-platform trash. macOS brew 'trash' takes -s -v. Linux trash-cli ships
+# 'trash-put' (with -v but no -s). Fall back to real rm if neither is present.
+if [[ "$OSTYPE" == "darwin"* ]] && command -v trash >/dev/null 2>&1; then
+    alias trash='trash -s -v'
+    alias rm='trash -s -v'
+elif command -v trash-put >/dev/null 2>&1; then
+    alias trash='trash-put -v'
+    alias rm='trash-put -v'
+fi
+# Else (no trash tool): rm stays as system rm — leave alone so users aren't surprised.
 alias cp='cp -iv'
 alias mv='mv -iv'
-alias vim='nvim'
+# Use nvim when available, fall back to system vim (server profile installs vim only).
+command -v nvim >/dev/null 2>&1 && alias vim='nvim'
 alias cal='gcal --starting-day=1'
 alias weather='curl v2.wttr.in'
 # alias ncu='npx ncu -i --format group'
@@ -27,6 +37,17 @@ alias lg='lazygit'
 if [[ "$OSTYPE" == "linux"* ]]; then
   command -v fdfind >/dev/null 2>&1 && ! command -v fd >/dev/null 2>&1 && alias fd='fdfind'
   command -v batcat >/dev/null 2>&1 && ! command -v bat >/dev/null 2>&1 && alias bat='batcat'
+fi
+
+# Desktop-only aliases — pruned on server profile because they wrap apps that
+# aren't installed (Arc browser, Claude/Gemini CLIs, npm-check, etc.) or are
+# macOS-specific (Spotlight). cool/heat are kept because the underlying scripts
+# dispatch to Linux siblings cleanly.
+if [[ "${SETUP_PROFILE:-desktop}" == "server" ]]; then
+    for _a in cc claude-work ccw arc make-backup make-stop spot-off spot-on ncu tgpt; do
+        unalias "$_a" 2>/dev/null
+    done
+    unset _a
 fi
 
 auto-ls-ll() {
