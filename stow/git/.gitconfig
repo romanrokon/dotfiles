@@ -22,3 +22,8 @@
 	side-by-side = true
 	line-numbers = true
 	syntax-theme = Monokai Extended
+[maintenance]
+	repo = /Volumes/Work/projects/freelance/revnest/frontend
+	repo = /Volumes/Work/projects/freelance/revnest/admin
+	repo = /Volumes/Work/projects/freelance/revnest/backend_refactoring
+	repo = /Volumes/Work/projects/freelance/revnest/revchat
