@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Flip a top-level boolean in ~/.claude/settings.json.
+# Usage: toggle-claude-setting <key>
+set -eu
+key=${1:-}
+[ -z "$key" ] && { echo "usage: toggle-claude-setting <key>" >&2; exit 2; }
+f=$HOME/.claude/settings.json
+tmp=$(mktemp -t claude-settings.XXXXXX)
+jq --arg k "$key" '.[$k] = ((.[$k] // false) | not)' "$f" > "$tmp"
+mv "$tmp" "$f"

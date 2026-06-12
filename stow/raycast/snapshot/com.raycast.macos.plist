@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSNavPanelExpandedSizeForOpenMode</key>
+	<string>{880, 448}</string>
+	<key>NSOSPLastRootDirectory</key>
+	<data>
+	Ym9va6wCAAAAAAUQQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+	AAAAAAAAAAAAAAAAAIwBAAAEAAAAAwMAAAAAACAFAAAAAQEAAFVzZXJzAAAABQAAAAEB
+	AAByem1hbgAAAAkAAAABAQAARG93bmxvYWRzAAAADAAAAAEGAAAQAAAAIAAAADAAAAAI
+	AAAABAMAACVDAAAAAAAACAAAAAQDAAD1twYAAAAAAAgAAAAEAwAAKLgGAAAAAAAMAAAA
+	AQYAAFgAAABoAAAAeAAAAAgAAAAABAAAQcbVGtXHI5gYAAAAAQIAAAIAAAAAAAAADwAA
+	AAAAAAAAAAAAAAAAAAAAAAABBQAACAAAAAQDAAABAAAAAAAAAAQAAAADAwAA9gEAAAgA
+	AAABCQAAZmlsZTovLy8MAAAAAQEAAE1hY2ludG9zaCBIRAgAAAAEAwAAANBld2cAAAAI
+	AAAAAAQAAEHHwdEIgAAAJAAAAAEBAABEODlDNDY2OS02RUM1LTRFNUUtQUMyNS0wNDQ5
+	QkU1NzM5MjUYAAAAAQIAAIEAAAABAAAA7xMAAAEAAAAAAAAAAAAAAAEAAAABAQAALwAA
+	ANgAAAD+////AQAAAAAAAAARAAAABBAAAEQAAAAAAAAABRAAAIgAAAAAAAAAEBAAAKwA
+	AAAAAAAAQBAAAJwAAAAAAAAAAiAAAIABAAAAAAAABSAAAPAAAAAAAAAAECAAAAABAAAA
+	AAAAESAAADQBAAAAAAAAEiAAABQBAAAAAAAAEyAAACQBAAAAAAAAICAAAGABAAAAAAAA
+	MCAAAMwAAAAAAAAAAcAAANQAAAAAAAAAEcAAACAAAAAAAAAAEsAAAOQAAAAAAAAAAdAA
+	AMwAAAAAAAAAENAAAAQAAAAAAAAA
+	</data>
+	<key>NSSplitView Subview Frames NSColorPanelSplitView</key>
+	<array>
+		<string>0.000000, 0.000000, 230.000000, 262.000000, NO, NO</string>
+		<string>0.000000, 263.000000, 230.000000, 67.000000, NO, NO</string>
+	</array>
+	<key>NSStatusItem Preferred Position extension_linear_unread-notifications__a9696c4c-a4e8-4ff1-bf49-c9015f796200</key>
+	<real>612</real>
+	<key>NSStatusItem Preferred Position extension_year-in-progress_index__54ef2a05-45c7-40fb-b459-9d82c96bbd7a</key>
+	<real>266</real>
+	<key>NSStatusItem Preferred Position raycastIcon</key>
+	<real>868</real>
+	<key>NSStatusItem VisibleCC Item-0</key>
+	<false/>
+	<key>NSStatusItem VisibleCC Item-1</key>
+	<false/>
+	<key>NSStatusItem VisibleCC extension_linear_unread-notifications__a9696c4c-a4e8-4ff1-bf49-c9015f796200</key>
+	<true/>
+	<key>NSStatusItem VisibleCC extension_year-in-progress_index__54ef2a05-45c7-40fb-b459-9d82c96bbd7a</key>
+	<true/>
+	<key>NSToolbar Configuration com.apple.NSColorPanel</key>
+	<dict>
+		<key>TB Is Shown</key>
+		<integer>1</integer>
+	</dict>
+	<key>NSWindow Frame NSColorPanel</key>
+	<string>234 158 250 297 0 0 1920 1049 </string>
+	<key>NSWindow Frame NSNavPanelAutosaveName</key>
+	<string>356 384 800 448 0 0 1512 944 </string>
+	<key>NSWindow Frame NSSpellCheckerSpellingPanel</key>
+	<string>570 434 431 289 0 0 1920 1049 </string>
+	<key>NSWindow Frame NSSpellCheckerSubstitutionsPanel2</key>
+	<string>1121 526 359 150 0 0 1512 949 </string>
+	<key>NSWindow Frame raycast-notes-window</key>
+	<string>815 879 396 117 0 0 2048 1122 </string>
+	<key>aiDynamicPlaceholdersMigrationDate</key>
+	<date>2025-08-15T12:25:21Z</date>
+	<key>amplitudePulseAnalyticsTracker_nextHeartbeatDate</key>
+	<date>2026-06-12T18:00:00Z</date>
+	<key>calculator_currenciesRefresh</key>
+	<data>
+	eyJzdWNjZWVkZWQiOnsiXzAiOjgwMjkyNDkzMy45MDY3MjV9fQ==
+	</data>
+	<key>clipboardHistory_selectedContentTypeFilter</key>
+	<string>all</string>
+	<key>clipboardHistory_selectedContentTypeFilterModifiedDate</key>
+	<date>2026-05-17T07:03:11Z</date>
+	<key>command-extension_kill-process.index__c0c9423a-7014-481e-8bb9-44c4c6df53be-searchBarAccessory_default_dropdown_id_previousValue</key>
+	<string>cpu</string>
+	<key>command-extension_kill-process.index__c0c9423a-7014-481e-8bb9-44c4c6df53be-searchBarAccessory_kill-process.sort-by_previousValue</key>
+	<string>cpu</string>
+	<key>command-extension_kill-process.index__c0c9423a-7014-481e-8bb9-44c4c6df53be_suppressed_alerts</key>
+	<dict>
+		<key>1b926c8ccf1dbc193b31141cbec76878e672d80e229fb250ddebf378bd4bda80</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>257c7e904e3eaa778af75c60f80d98cf52cc553ac7fe7458fb6ce3870e63dc79</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>365ca8901c3f550db91e4fdf0d985fca9d706c2c7a6cc4b5495afb928087d882</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>3a2298eadd113513d4349c3dd54f46edf344739bad66a55efe83073c0f68de53</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>4be1a08eb1206019d9b084acec67f75d1d7c65b13f39693f89f61c907386a73f</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>5447091f1028448ac25edf24108aae6ca224d33f5dc60a385d1df7f99c09e559</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>56c4f4e12ba1e42a700b70b1e03e9981c818d8c7f06423a1b95afa7d5f0ba08c</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>56d0b0e179047026d3e699fcf27e9d76a2d3da014985823821bc4d1dd6587615</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>57212f94e4472730bc1b958829612a98d563ccc51a0f8d7490791eab4ca56bc2</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>5a144e707201173dabb2b96fde0ab170c5758fa9f0858ab7b76eda7e4de9da77</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>785055db7a0394caef451169fcd52820ebc77fb1c441ca48157f9358af6c7ce7</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>7ce28b95207796bcc63ac562dea02ebbc7c248dcdc9bc685378cc80aca6349e5</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>7deb4396ea5904de4df20c1c5af5e03a96a2ed59646fb9bdffc212a95e7fcb85</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>8942c2ec441b5120f26c9371bf6e60ff5ed79f0774e4a568b5eae41baba8eefb</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>9fc383316c244b9895f3d588ef218fbc63bb9385f3dc156bd09c5ce318b5b943</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>a31e1bdf80323b1319a7f8bf2bcd6a4dc4df013bacfb42f9637f098ea0e9cea6</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>a3f12f5f78a68ad1e354c669278d38089caf7958630132b68af3415b57d16146</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>a7523dfa7870e1e2195c162504701e4faa8abef259fe84b13a3fdee807d5e8a1</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>a98ec558b580bb251d58b3df5583f51f923a0c9f4d1b66ce0a5f95c3e05d4ce3</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>c96407ada49e082508de538a946f2e74ec612ddf1a61a0d3564ed9941dbb1c53</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>c9668dce08b71ff69772d4ec7d6e44119a5ab4c26e4e1394fc9d27a1e1014b89</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+		<key>f847090ee162a214a28bd85d1123c83f15cee74bce5c475156b40f7ed0e7f6c3</key>
+		<data>
+		eyJzaG91bGRTdXBwcmVzcyI6ZmFsc2V9
+		</data>
+	</dict>
+	<key>command-extension_linear.unread-notifications__a9696c4c-a4e8-4ff1-bf49-c9015f796200_activated</key>
+	<true/>
+	<key>command-extension_mole.health-menu-bar__76ff4c05-b41a-4e87-9136-f8dffdf5b2c4_activated</key>
+	<true/>
+	<key>command-extension_phosphor-icons.search__bcc1216f-0e0e-4071-a892-fbbc68bdd94c-searchBarAccessory_default_dropdown_id_previousValue</key>
+	<string>fill</string>
+	<key>command-extension_raytyping.raytype__fe4563af-88e6-4635-9c79-6702f8093cfc-searchBarAccessory_default_dropdown_id_previousValue</key>
+	<string>10</string>
+	<key>command-extension_svgl.index__8dfe8703-e47d-45b4-bc86-605b1fd89401-searchBarAccessory_default_dropdown_id_previousValue</key>
+	<string>Library</string>
+	<key>command-extension_year-in-progress.index__54ef2a05-45c7-40fb-b459-9d82c96bbd7a_activated</key>
+	<true/>
+	<key>commandScheduler_commandRuns</key>
+	<dict/>
+	<key>commandsPreferencesExpandedItemIds</key>
+	<array>
+		<string>systemPrefs</string>
+		<string>extension_tailwindcss__80b2f7bf-85ba-4946-8b87-c0f015284bf5</string>
+		<string>builtin_package_screenshots</string>
+		<string>extension_linear__a9696c4c-a4e8-4ff1-bf49-c9015f796200</string>
+		<string>extension_year-in-progress__54ef2a05-45c7-40fb-b459-9d82c96bbd7a</string>
+		<string>builtin_package_windowManagement</string>
+		<string>builtin_package_clipboardHistory</string>
+	</array>
+	<key>commandsPreferencesLastSelectedFilterTab</key>
+	<string>commands</string>
+	<key>database_lastValidAppVersion</key>
+	<string>1.104.19</string>
+	<key>database_lastValidOSVersion</key>
+	<string>26.4.1</string>
+	<key>fallbackSearches_didMigrateScriptCommands</key>
+	<true/>
+	<key>floatingNotes_didCreateOnboardingNote</key>
+	<true/>
+	<key>floatingNotes_didMigrateFloatingNotesHotkeysAndAliases</key>
+	<true/>
+	<key>floatingNotes_didMigrateFloatingNotesRecords</key>
+	<true/>
+	<key>floatingNotes_lastSelectedDocumentId</key>
+	<string>572518F9-B8B6-45D2-98E6-3E169E2E768F</string>
+	<key>floatingNotes_raycastNotesFormatBarVisible</key>
+	<false/>
+	<key>floatingNotes_raycastNotesNavigateBackStack</key>
+	<array>
+		<string>74786A42-A85D-4196-9B2C-BE9FA35F9E18</string>
+	</array>
+	<key>floatingNotes_raycastNotesNavigateForwardStack</key>
+	<array/>
+	<key>hasQueuedStatusBarHint</key>
+	<false/>
+	<key>hasShownStatusBarHintAfterOnboarding</key>
+	<true/>
+	<key>mainWindowPositionCache</key>
+	<dict>
+		<key>1(-1512.0, 170.0, 1512.0, 982.0)</key>
+		<string>{-1131, 1015}</string>
+		<key>1(-1512.0, 98.0, 1512.0, 982.0)</key>
+		<string>{-1131, 943}</string>
+		<key>1(0.0, 0.0, 1512.0, 982.0)</key>
+		<string>{381, 845}</string>
+		<key>2(0.0, 0.0, 1920.0, 1080.0)</key>
+		<string>{581, 858}</string>
+		<key>2(0.0, 0.0, 2048.0, 1152.0)</key>
+		<string>{649, 969}</string>
+		<key>2(0.0, 0.0, 2560.0, 1440.0)</key>
+		<string>{905, 1179}</string>
+		<key>2(1512.0, -98.0, 1920.0, 1080.0)</key>
+		<string>{2097, 818}</string>
+		<key>3(0.0, 0.0, 1920.0, 1080.0)</key>
+		<string>{585, 916}</string>
+		<key>3(0.0, 0.0, 2048.0, 1152.0)</key>
+		<string>{649, 969}</string>
+		<key>3(0.0, 0.0, 2560.0, 1440.0)</key>
+		<string>{905, 1179}</string>
+		<key>9(0.0, 0.0, 1920.0, 1080.0)</key>
+		<string>{585, 916}</string>
+	</dict>
+	<key>mainWindow_isMonitoringGlobalHotkeys</key>
+	<true/>
+	<key>onboardingCompleted</key>
+	<true/>
+	<key>onboarding_completedTaskIdentifiers</key>
+	<array>
+		<string>quicklinks</string>
+		<string>calculator</string>
+		<string>floatingNotes</string>
+		<string>installFirstExtension</string>
+	</array>
+	<key>onboarding_raycastShortcuts</key>
+	<array>
+		<string>Esc</string>
+		<string>⌘,</string>
+	</array>
+	<key>onboarding_setupHotkey</key>
+	<true/>
+	<key>onboarding_showTasksProgress</key>
+	<true/>
+	<key>permissions.folders.read:/Users/rzman/Desktop</key>
+	<true/>
+	<key>permissions.folders.read:/Users/rzman/Documents</key>
+	<true/>
+	<key>permissions.folders.read:/Users/rzman/Downloads</key>
+	<true/>
+	<key>permissions.folders.read:cloudStorage</key>
+	<true/>
+	<key>permissions.folders.read:removableVolumes</key>
+	<true/>
+	<key>raycast-updates-lastAppUpdateCheckDate</key>
+	<real>1781227603.0607359</real>
+	<key>raycast-updates-lastTargetCommitishInstalled</key>
+	<string>a692672dd3b7cf4d53b6a8c6bf3c1b6e3664190c</string>
+	<key>raycast-updates-versionOfLastSeenReleaseNotes</key>
+	<string>1.104.7</string>
+	<key>raycast-updates-whatsNewItemDisplayDate</key>
+	<real>1780918954.1874051</real>
+	<key>raycast-wrapped-2025-dataSummary</key>
+	<string>days: 147 opened: 2185 topAppsRaw: 81 topApps: 10 actions: 608</string>
+	<key>raycastAnonymousId</key>
+	<string>030E2A33-EB29-4BEB-8EBB-C401C5EC50FF</string>
+	<key>raycastFirstKnownAppVersion</key>
+	<data>
+	IjEuMTAyLjQi
+	</data>
+	<key>raycastGlobalHotkey</key>
+	<string>Command-49</string>
+	<key>raycastInstallationDate</key>
+	<date>2025-08-15T12:25:21Z</date>
+	<key>raycastLoginItemAutoInstalled</key>
+	<date>2025-08-15T12:25:22Z</date>
+	<key>raycastPreferredWindowMode</key>
+	<string>default</string>
+	<key>raycastShouldFollowSystemAppearance</key>
+	<true/>
+	<key>screenshots_dataSourceEnabled</key>
+	<true/>
+	<key>showGettingStartedLink</key>
+	<false/>
+	<key>siriShortcuts_siriShortcutsPermissionState</key>
+	<string>granted</string>
+	<key>store_everInstalled</key>
+	<array>
+		<string>fe4563af-88e6-4635-9c79-6702f8093cfc</string>
+		<string>d3e7311b-4072-498b-aeb6-4da257176d80</string>
+		<string>8dfe8703-e47d-45b4-bc86-605b1fd89401</string>
+		<string>4d4af936-2e32-446b-a8f9-d710b41aa36d</string>
+		<string>b081c457-37b4-48cb-8172-0ff2853c8ece</string>
+		<string>54ef2a05-45c7-40fb-b459-9d82c96bbd7a</string>
+		<string>40ebc708-964f-473b-8d19-d4e9cbd27ae9</string>
+		<string>30370bf8-bb2c-41ad-844b-ff661ae4337a</string>
+		<string>b0f3965c-503b-4b97-ba32-f80a87d32b79</string>
+		<string>bcc1216f-0e0e-4071-a892-fbbc68bdd94c</string>
+		<string>a9696c4c-a4e8-4ff1-bf49-c9015f796200</string>
+		<string>c0c9423a-7014-481e-8bb9-44c4c6df53be</string>
+		<string>80b2f7bf-85ba-4946-8b87-c0f015284bf5</string>
+		<string>76ff4c05-b41a-4e87-9136-f8dffdf5b2c4</string>
+	</array>
+	<key>store_migratedHackerNews</key>
+	<true/>
+	<key>store_migratedNative</key>
+	<true/>
+	<key>store_migratedReminders</key>
+	<true/>
+	<key>store_termsAccepted</key>
+	<true/>
+	<key>subscriptions_active</key>
+	<false/>
+	<key>useHyperKeyIcon</key>
+	<false/>
+</dict>
+</plist>

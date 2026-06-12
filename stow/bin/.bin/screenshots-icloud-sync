@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Weekly mirror: ~/Screenshots  ->  iCloud Drive / Screenshots
+# Adds new files, propagates deletes. Invoked by SwiftBar plugin (FDA scope).
+
+set -u
+
+SRC="$HOME/Screenshots/"
+DST="$HOME/Library/Mobile Documents/com~apple~CloudDocs/Screenshots/"
+LOCK="/tmp/screenshots-icloud-sync.lock"
+MAX_DELETE=20
+
+# Lock — mkdir is atomic; refuses if dir exists.
+if ! mkdir "$LOCK" 2>/dev/null; then
+    pid=$(cat "$LOCK/pid" 2>/dev/null || echo "?")
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] another sync in progress (pid=$pid); exiting"
+    exit 0
+fi
+echo $$ > "$LOCK/pid"
+trap 'rm -rf "$LOCK"' EXIT
+
+if ! mkdir -p "$SRC" "$DST"; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] mkdir failed (TCC?); aborting" >&2
+    exit 1
+fi
+
+ts=$(date '+%Y-%m-%d %H:%M:%S')
+echo "[$ts] rsync start"
+
+# --max-delete=N aborts if >N files would be deleted. Guards against
+# wiping iCloud backup when ~/Screenshots is accidentally emptied.
+/usr/bin/rsync -aH --delete --max-delete="$MAX_DELETE" \
+    --exclude '.DS_Store' \
+    --exclude '.localized' \
+    "$SRC" "$DST"
+rc=$?
+
+if [ "$rc" -eq 25 ]; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ABORT: --max-delete=$MAX_DELETE exceeded. Refusing to mirror." >&2
+elif [ "$rc" -ne 0 ]; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] rsync failed rc=$rc" >&2
+fi
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] rsync done rc=$rc"
+exit "$rc"

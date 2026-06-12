@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Run iCloud screenshot sync now, regardless of last-run timestamp.
+set -eu
+rm -f "$HOME/.cache/screenshots-icloud-sync.last"
+exec "$HOME/.bin/screenshots-icloud-sync"

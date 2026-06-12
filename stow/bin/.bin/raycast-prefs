@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# raycast-prefs: snapshot or restore Raycast's editable plist preferences.
+# The encrypted GRDB sqlite (script dirs, AI history, hotkeys for extensions)
+# is intentionally NOT snapshotted — it is machine-bound and opaque.
+
+set -eu
+
+SNAP="$HOME/.dotfiles/stow/raycast/snapshot/com.raycast.macos.plist"
+DOMAIN="com.raycast.macos"
+
+cmd=${1:-}
+
+case "$cmd" in
+export)
+    mkdir -p "$(dirname "$SNAP")"
+    defaults export "$DOMAIN" "$SNAP"
+    plutil -convert xml1 "$SNAP"
+    echo "exported $DOMAIN -> $SNAP"
+    ;;
+import)
+    [ -f "$SNAP" ] || { echo "no snapshot at $SNAP" >&2; exit 1; }
+    if pgrep -x Raycast >/dev/null; then
+        echo "Raycast is running. Quit it first (osascript -e 'quit app \"Raycast\"')." >&2
+        exit 1
+    fi
+    defaults import "$DOMAIN" "$SNAP"
+    /usr/bin/killall cfprefsd 2>/dev/null || true
+    echo "imported $SNAP -> $DOMAIN. Relaunch Raycast."
+    ;;
+diff)
+    [ -f "$SNAP" ] || { echo "no snapshot at $SNAP" >&2; exit 1; }
+    tmp=$(mktemp -t raycast-current.XXXXXX.plist)
+    defaults export "$DOMAIN" "$tmp"
+    plutil -convert xml1 "$tmp"
+    diff -u "$SNAP" "$tmp" || true
+    rm -f "$tmp"
+    ;;
+*)
+    cat >&2 <<'EOF'
+usage: raycast-prefs {export|import|diff}
+
+  export  capture current ~/Library/Preferences/com.raycast.macos.plist
+          into the dotfiles snapshot (xml form, diff-friendly)
+  import  install snapshot back into the system (Raycast must be quit)
+  diff    show what current prefs differ from the snapshot
+EOF
+    exit 2
+    ;;
+esac

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Triggered by launchd whenever the iCloud Screenshots folder changes.
+# Master location:  ~/Library/Mobile Documents/com~apple~CloudDocs/Screenshots
+#   - iCloud-synced backup, not TCC-blocked (only iCloud Desktop/Documents are).
+# Behavior:
+#   1. Find newest fresh screenshot.
+#   2. Copy image to clipboard.
+#   3. Drop a symlink in ~/Desktop so Stacks groups it like before.
+
+set -u
+
+SHOTS="$HOME/Screenshots"
+STATE="${XDG_CACHE_HOME:-$HOME/.cache}/last-screenshot-clip"
+
+ts=$(date +%H:%M:%S)
+total=$(find "$SHOTS" -maxdepth 1 -type f -name '*.png' 2>/tmp/sc2c.ferr | wc -l | tr -d ' ')
+ferr=$(cat /tmp/sc2c.ferr 2>/dev/null); rm -f /tmp/sc2c.ferr
+[ -n "$ferr" ] && echo "[$ts] find err: $ferr" >&2
+
+newest=$(find "$SHOTS" -maxdepth 1 -type f \
+    \( -name 'Screenshot *.png' -o -name 'Screen Shot *.png' \) \
+    -print0 2>/dev/null \
+    | xargs -0 stat -f '%m %N' 2>/dev/null \
+    | sort -rn | head -1 | cut -d' ' -f2-)
+
+if [ -z "$newest" ]; then
+    echo "[$ts] no candidate (total png seen=$total)" >&2
+    exit 0
+fi
+[ -f "$newest" ] || { echo "[$ts] candidate vanished: $newest" >&2; exit 0; }
+
+mkdir -p "$(dirname "$STATE")"
+last=""
+[ -f "$STATE" ] && last=$(cat "$STATE")
+if [ "$last" = "$newest" ]; then
+    # uncomment to confirm dedup: echo "[$ts] dedup hit: $newest" >&2
+    exit 0
+fi
+echo "[$ts] newest changed: $(basename "$newest") (total png seen=$total)" >&2
+
+osascript -e "set the clipboard to (read (POSIX file \"$newest\") as «class PNGf»)" || exit 1
+
+printf '%s' "$newest" > "$STATE"
+echo "[$(date +%H:%M:%S)] copied: $(basename "$newest")" >&2
