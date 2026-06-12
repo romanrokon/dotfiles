@@ -88,8 +88,8 @@ fi
 
 # ── Actions ───────────────────────────────────────────────────────────────────
 echo "---"
-echo "Run status report | shell=$HOME/.bin/git-maintain-status terminal=true refresh=true"
+echo "Run status report | bash=$HOME/.bin/in-ghostty param0=$HOME/.bin/git-maintain-status refresh=true"
 if [ "$STALE_PATH" -gt 0 ]; then
-    echo "Prune ${STALE_PATH} stale path(s) | shell=$HOME/.bin/git-maintain-prune param1=--yes terminal=true refresh=true"
+    echo "Prune ${STALE_PATH} stale path(s) | bash=$HOME/.bin/in-ghostty param0=$HOME/.bin/git-maintain-prune param1=--yes refresh=true"
 fi
 echo "Refresh | refresh=true"

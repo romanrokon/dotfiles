@@ -102,6 +102,6 @@ fi
 echo "---"
 
 # --- Actions ---
-echo "🧊 Cooldown (kill daemons + purge) | bash=$HOME/.bin/cooldown terminal=true refresh=true"
+echo "🧊 Cooldown (kill daemons + purge) | bash=$HOME/.bin/in-ghostty param0=$HOME/.bin/cooldown refresh=true"
 echo "📊 Open Activity Monitor | bash=open param0=-a param1=Activity\\ Monitor terminal=false"
 echo "🔄 Refresh | refresh=true"

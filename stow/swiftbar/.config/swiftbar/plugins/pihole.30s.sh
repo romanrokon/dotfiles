@@ -97,8 +97,8 @@ fi
 
 echo "---"
 echo "Open admin in browser | href=$ADMIN_URL"
-echo "Ping pihole | bash=ping param0=-c param1=4 param2=$PIHOLE_IP terminal=true"
-echo "SSH to pihole | bash=ssh param0=$PIHOLE_HOST terminal=true"
-echo "Tailscale status | bash=/Applications/Tailscale.app/Contents/MacOS/Tailscale param0=status terminal=true"
+echo "Ping pihole | bash=$HOME/.bin/in-ghostty param0=ping param1=-c param2=4 param3=$PIHOLE_IP"
+echo "SSH to pihole | bash=$HOME/.bin/in-ghostty param0=ssh param1=$PIHOLE_HOST"
+echo "Tailscale status | bash=$HOME/.bin/in-ghostty param0=/Applications/Tailscale.app/Contents/MacOS/Tailscale param1=status"
 echo "---"
 echo "Refresh | refresh=true"

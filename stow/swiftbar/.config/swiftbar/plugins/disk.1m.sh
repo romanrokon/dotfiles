@@ -94,17 +94,17 @@ for v in "${VOLUMES[@]}"; do
     TRASH_SIZE=$(du -sh "$TRASH" 2>/dev/null | cut -f1)
     echo "-- Empty trash on $vol_name (${TRASH_SIZE:-?}) | bash=/bin/rm param0=-rf param1=$TRASH/* terminal=false refresh=true"
   fi
-  echo "-- Top 10 biggest dirs (terminal) | bash=/bin/sh param0=-c param1='du -sh $v/* 2>/dev/null | sort -rh | head -20; echo; read -p \"Press enter to close\"' terminal=true"
+  echo "-- Top 10 biggest dirs (terminal) | bash=$HOME/.bin/in-ghostty param0=/bin/sh param1=-c param2='du -sh $v/* 2>/dev/null | sort -rh | head -20'"
   echo "---"
 done
 
 # --- global cleanup actions ---
 echo "🧹 Cleanup actions"
-echo "-- Brew cleanup (frees brew caches) | bash=/opt/homebrew/bin/brew param0=cleanup terminal=true refresh=true"
-echo "-- Docker/OrbStack prune | bash=/usr/local/bin/docker param0=system param1=prune param2=-af terminal=true refresh=true"
+echo "-- Brew cleanup (frees brew caches) | bash=$HOME/.bin/in-ghostty param0=/opt/homebrew/bin/brew param1=cleanup refresh=true"
+echo "-- Docker/OrbStack prune | bash=$HOME/.bin/in-ghostty param0=/usr/local/bin/docker param1=system param2=prune param3=-af refresh=true"
 echo "-- Empty all trashes | bash=/usr/bin/osascript param0=-e param1='tell application \"Finder\" to empty trash' terminal=false refresh=true"
-echo "-- Purge inactive RAM | bash=/usr/bin/sudo param0=purge terminal=true"
-echo "-- Clear ~/Library/Caches (heavy) | bash=/bin/sh param0=-c param1='du -sh ~/Library/Caches; read -p \"Delete? (y/n): \" a; [ \"\$a\" = y ] && rm -rf ~/Library/Caches/*' terminal=true refresh=true"
+echo "-- Purge inactive RAM | bash=$HOME/.bin/in-ghostty param0=/usr/bin/sudo param1=purge"
+echo "-- Clear ~/Library/Caches (heavy) | bash=$HOME/.bin/in-ghostty param0=/bin/sh param1=-c param2='du -sh ~/Library/Caches; read -p \"Delete? (y/n): \" a; [ \"\$a\" = y ] && rm -rf ~/Library/Caches/*' refresh=true"
 echo "---"
 
 echo "Refresh | refresh=true"

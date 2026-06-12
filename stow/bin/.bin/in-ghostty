@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Open a new Ghostty window running the given command, then pause for a key.
+# Drop-in replacement for SwiftBar's terminal=true (Terminal.app-only).
+#
+# Usage: in-ghostty <cmd> [args...]
+
+set -u
+
+if [ $# -lt 1 ]; then
+  echo "usage: in-ghostty <cmd> [args...]" >&2
+  exit 2
+fi
+
+# Re-quote args into a single bash -c string so we can append the pause.
+quoted=$(printf '%q ' "$@")
+script="${quoted}; ec=\$?; echo; printf '[exit %s] press any key to close...' \"\$ec\"; read -n1 -s -r"
+
+exec /usr/bin/open -na Ghostty.app --args -e /bin/bash -c "$script"
