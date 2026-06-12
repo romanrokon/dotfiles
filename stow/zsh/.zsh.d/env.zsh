@@ -49,6 +49,14 @@ if [ -d "$NVM_DIR/versions/node" ]; then
     fi
 fi
 
+# @ AI Context: Cap Node's V8 heap (12 GB) so a runaway build worker dies instead
+# of exhausting RAM. Set flat here (not via cmux's --require shim) so the cap
+# propagates to child processes — cmux only caps the top-level process and strips
+# it from children, which is how an uncapped `next build` worker can balloon.
+# Native memory (Turbopack-Rust, Chromium) is bounded by the memwatch launchd
+# agent (com.rzman.memwatch) instead, since max-old-space-size only limits JS heap.
+export NODE_OPTIONS="--max-old-space-size=12288"
+
 # Deno
 [ -f "$HOME/.deno/env" ] && . "$HOME/.deno/env"
 if [[ ":$FPATH:" != *":$HOME/.zsh/completions:"* ]]; then

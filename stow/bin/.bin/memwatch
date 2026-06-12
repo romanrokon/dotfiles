@@ -1,0 +1,61 @@
+#!/bin/bash
+# @ AI Context: Memory watchdog daemon (run by com.rzman.memwatch launchd agent).
+# Samples RSS every INTERVAL seconds and KILLS any single non-protected process
+# exceeding THRESH_GB. This is the only guard that bounds *native* runaways
+# (Turbopack-Rust, Chromium) that NODE_OPTIONS=--max-old-space-size cannot cap.
+# Protected procs (cmux/claude/terminals/editors/system) are logged, never killed.
+# Logging is lean: only kills, protected-over-threshold, and a periodic heartbeat,
+# with size-based rotation so the log can't grow unbounded on a long-lived daemon.
+
+set -u
+
+LOG_DIR="$HOME/Library/Logs"
+LOG="$LOG_DIR/memwatch.log"
+INTERVAL=8
+THRESH_GB=18
+THRESH_KB=$((THRESH_GB * 1048576))
+HEARTBEAT_EVERY=75          # ~10 min at 8s interval
+MAX_LOG_LINES=5000
+PROTECT='cmux|claude|WindowServer|kernel_task|launchd|loginwindow|logind|Finder|Dock|SystemUIServer|WindowManager|mds|mdworker|spotlight|coreaudiod|bluetoothd|securityd|opendirectoryd|distnoted|cfprefsd|memwatch|sleep|sshd|Ghostty|iTerm|Terminal|Code|Cursor|Raycast|Slack'
+
+mkdir -p "$LOG_DIR"
+
+log() { printf '%s  %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$1" >> "$LOG"; }
+notify() { osascript -e "display notification \"$1\" with title \"memwatch: killed runaway\"" >/dev/null 2>&1; }
+rotate() {
+  [ -f "$LOG" ] || return 0
+  local n; n=$(wc -l < "$LOG")
+  if [ "$n" -gt "$MAX_LOG_LINES" ]; then
+    tail -n 1000 "$LOG" > "$LOG.tmp" && mv "$LOG.tmp" "$LOG"
+  fi
+}
+
+log "memwatch started (threshold=${THRESH_GB}GB interval=${INTERVAL}s pid=$$)"
+ticks=0
+
+while true; do
+  # Top non-protected offender, for the heartbeat line.
+  peak=$(ps -axo rss,comm | sort -rn | awk 'NR==2{printf "%.1fGB %s", $1/1048576, $2}')
+
+  # Kill pass.
+  while read -r rss pid comm; do
+    [ -z "${rss:-}" ] && continue
+    gb=$((rss / 1048576))
+    if printf '%s' "$comm" | grep -qiE "$PROTECT"; then
+      log "PROTECTED over ${THRESH_GB}GB (spared): pid=$pid ${gb}GB $comm"
+    else
+      log "*** KILLING runaway: pid=$pid ${gb}GB $comm ***"
+      kill -TERM "$pid" 2>/dev/null; sleep 2
+      kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" 2>/dev/null
+      notify "$comm (pid $pid) hit ${gb}GB"
+    fi
+  done < <(ps -axo rss,pid,comm | awk -v t="$THRESH_KB" 'NR>1 && $1>t {print $1, $2, substr($0,index($0,$3))}')
+
+  ticks=$((ticks + 1))
+  if [ $((ticks % HEARTBEAT_EVERY)) -eq 0 ]; then
+    log "heartbeat ok — top process ${peak}"
+    rotate
+  fi
+
+  sleep "$INTERVAL"
+done
