@@ -48,7 +48,30 @@ Arguments: `$ARGUMENTS`
 
 6. **Do NOT change the ticket status.** The human will move it when they're ready.
 
-7. **Emit final block** on the LAST lines of output (the bot parses this — no extra text after):
+7. **Map the ticket to code areas.** Cross-reference the ticket against this project's layout (paths relative to repo root):
+   - **Routes**: `src/app/(site-layout)/`, `src/app/(wizard-layout)/`, `src/app/(sanity-layout)/`, `src/app/api/`
+   - **Components**: `src/components/common/` (reusable — check here first), `src/components/layout/`, `src/components/RSC/`, domain folders (`destination/`, `pricing/`, `profile/`, `regulation/`, `landing/`, etc.)
+   - **State**: `src/redux/slices/`, `src/redux/api/{domain}/`
+   - **Services**: `src/services/`
+   - **CMS / Sanity**: `sanity/`, `src/app/(sanity-layout)/`
+   - **Feature flags**: `src/flags.ts`
+
+   List concrete files/dirs you expect to touch.
+
+8. **Check for reusable primitives.** Before proposing any new UI, grep `src/components/common/` and the Radix imports in `package.json` — reuse beats rebuild.
+
+9. **Propose a plan.** Lay out:
+   - Steps you'd take
+   - Files to edit/create
+   - Data shape changes
+   - New RTK Query endpoints if any
+   - Test coverage
+
+   Call out risks: URL shape changes (break deep links), persist shape changes (break existing users' localStorage), secrets leaking into client bundles, build-time-only envs.
+
+   **Do NOT stop for approval** — you are non-interactive. Just print the plan to the session before the result block; the next human (in the resumed session) will review and direct from there.
+
+10. **Emit final block** on the LAST lines of output (the bot parses this — no extra text after):
 
 ```
 <<<SLACK_INTAKE_RESULT
