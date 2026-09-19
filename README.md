@@ -16,6 +16,7 @@ cd ~/.dotfiles
 - `stow-all.sh` — symlink every `stow/*/` package into `$HOME` via GNU Stow.
 - `stow/` — packages: `zsh`, `git`, `ghostty`, `lazygit`, `swiftbar`, `bin`, etc.
 - `brew.txt`, `apt.txt` — package manifests.
+- `apps/alttab/` — vendored free AltTab fork + installer (replaces the brew cask). See its README.
 - `NOGIT/` — globally git-ignored scratch / backups.
 
 ## Manual extras

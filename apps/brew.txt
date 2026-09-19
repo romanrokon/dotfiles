@@ -1,6 +1,5 @@
 ghostty
 vimr
-alt-tab
 qlcolorcode
 gh
 fastfetch

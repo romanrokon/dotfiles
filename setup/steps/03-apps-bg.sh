@@ -10,6 +10,8 @@ _install_apps_mac() {
     xargs brew install < "$list"
     # Yazi deps
     brew link ffmpeg-full imagemagick-full -f --overwrite 2>/dev/null || true
+    # Free AltTab fork from vendored zip; brew cask is upstream's paywalled build.
+    "$DOTFILES_DIR/apps/alttab/install.sh" || log_err "AltTab install failed"
 }
 
 # Install apt packages one at a time, tolerant of missing packages (different
