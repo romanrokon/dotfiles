@@ -287,8 +287,74 @@ import { useEffect } from 'react';
 - Always use `trash` for deleting files and folder
 - Always use `trash` instead of `rm` or `rm -rf`
 - Never install or build anything that requires x86_64 arch
+- **Docker runtime is OrbStack.** Docker Desktop was removed months ago. Never
+  install it, never `open -a Docker`, never `brew install --cask docker`. On
+  "Cannot connect to the Docker daemon", the cause is almost always the active
+  context, not a missing app: run `docker context ls` and `docker context use
+  orbstack`, and start OrbStack (`open -a OrbStack`) if it is not running. A
+  stale `desktop-linux` context points at
+  `unix://~/.docker/run/docker.sock`, which nothing is listening on.
+- If `docker compose` reports "unknown command" while `docker-compose` works,
+  the CLI plugin dir is missing, not the tool. Relink it — do NOT install
+  anything:
+  `ln -sf /Applications/OrbStack.app/Contents/MacOS/xbin/docker-compose ~/.docker/cli-plugins/docker-compose`
+  (same for `docker-buildx`). `~/.docker/config.json` is shared with OrbStack:
+  it carries `credsStore`, so edit `currentContext` in place, never delete it.
+- Never install system software, casks, or daemons without asking me first.
+  "The test suite needs it" is a reason to ask, not a reason to install.
 - When visiting a url, check for markdown version by attaching `.md` at the end of the path, otherwise use token efficient method to read a webpage
 - Always prefer color text-primary, text-secondary etc over explicit similar color like text-gray-500
+
+# Writing
+
+Applies to everything with words in it: product copy, headings, docs, commit
+messages, and your replies to me. The failure mode is writing that has the SHAPE
+of good writing and carries no information — it reads like a manifesto and tells
+the reader nothing.
+
+## The test
+
+**Could this sentence appear on a competitor's site, unchanged?** If yes, it says
+nothing. Delete it or replace it with the specific fact it was standing in for.
+
+Second test: **is there a noun in it I can picture?** "Two people, ten years, one
+thing done properly" passes. "Deep experience and a commitment to craft" does not.
+
+## The tics, by name
+
+1. **Antithesis / chiasmus** — `X, not Y`. The strongest tell.
+   - No: "Things we own, not things we were hired to build."
+   - Yes: "Our own products." Or name them.
+2. **Aphorism with no referent** — a line that would fit any company, any product.
+3. **Rule of three** — "fast, safe and simple." Three adjectives is a rhythm, not
+   an argument. Use one, and make it specific.
+4. **Abstract nouns doing the work** — clarity, craft, intentionality, care,
+   thoughtfulness. Name what was done instead.
+5. **"It's not just X, it's Y."**
+6. **Portentous fragment** — "That's the point." "By design." "Every time."
+7. **Self-praise as description** — deliberately, carefully, hand-crafted,
+   thoughtfully. If the reason is real, give it; otherwise cut the adverb.
+8. **Em-dash stacking** — more than one appositive per sentence. If a second idea
+   needs bolting on, it needs its own sentence.
+9. **Copy about the copy** — "Here's what makes this different."
+10. **Vague superlatives** — beautiful, seamless, delightful, powerful.
+
+## Rules
+
+- Concrete noun over abstract one. A number over an adjective.
+- One idea per sentence.
+- Cut any sentence whose only job is rhythm.
+- Never announce that a choice was deliberate. Give the reason, or say nothing.
+- A heading names the thing, not the theme.
+- Say the awkward part plainly rather than softening it into abstraction — the
+  softened version is always the one that sounds AI-written.
+
+## In replies to me
+
+- Open with the result. No restating what I asked.
+- No closing summary of what you just said.
+- Don't narrate what you're about to do; do it.
+- When something failed, say so in the first sentence, not after the good news.
 
 # Subagents, Fan-out & Token Cost
 
@@ -298,14 +364,33 @@ the same context replayed on every turn of every agent. Cost scales with
 `context size x turns x agents`, not with how much the agents write.
 
 ## Model tier
-- Big fan-outs (3+ parallel agents) run on **Sonnet** by default. Only use a
-  premium tier — Opus, Fable, or anything Mythos-class — for a fleet when I
-  explicitly ask for it.
-- The parent (or another higher-tier model) **must verify** what the fleet
-  returns. Cheap agents find and draft; the expensive model checks, resolves
-  conflicts, and decides. Never ship a fleet's output unverified.
-- Single deep-reasoning tasks may stay on the higher tier — the rule targets
-  breadth, not depth.
+
+**Every `agent()` call and every Agent-tool call names its model explicitly.
+There is no case where omitting it is correct.**
+
+This overrides the Workflow tool's own documentation, which says "Default to
+omitting `model` — the agent inherits the main-loop model, which is almost
+always correct." It is not correct here. Omitting it silently runs an entire
+fleet on the session model; that is how a week of quota disappears in a day.
+When the tool's default and this file disagree, this file wins.
+
+- **Executors run `model: 'sonnet'`.** Anything that applies a spec, edits
+  files, greps, reads, or reports findings. Agent count is irrelevant — a
+  single agent that types code is still an executor. "It's only two agents" is
+  not an exemption, and neither is "the task is important".
+- **The session model plans and verifies, and does nothing else.** It writes the
+  spec; it judges the result. If one agent is both deciding the design and
+  typing it, the split has not happened and the work is mis-tiered — re-scope it
+  before launching.
+- Premium tier for a fleet only when I ask for it in that same message. A
+  standing "ultracode" authorizes breadth, never tier.
+- Single deep-reasoning tasks may stay on the higher tier — depth, not breadth.
+- Never ship a fleet's output unverified.
+
+**Pre-launch checkpoint.** Before calling Workflow or spawning agents, write one
+line in the reply: how many agents, at which model and effort, and who verifies.
+If that line cannot be written, the script is not ready to run. Putting it in the
+message is what lets me stop you before the spend, not after.
 
 ## Fleet size
 - **10-15 concurrent agents maximum.** If the work needs more, batch it in
@@ -325,6 +410,93 @@ the same context replayed on every turn of every agent. Cost scales with
 - Cap agent turns by giving a clear stop condition; an agent with a vague task
   keeps looping over the same expensive context.
 - Long tool output belongs in a file or the scratchpad, not the transcript.
+
+## Plan, then execute (the default for medium+ work)
+
+Split the work: an expensive model **plans**, a cheap model **executes**, the
+expensive model **verifies**. Planning is where judgement lives and is worth the
+tokens; typing the edit is not.
+
+- **Planner**: Opus, `xhigh` only when I have agreed to it (see Effort below).
+  Reads what it needs, writes a spec. Does not edit.
+- **Executor**: Sonnet, `low`/`medium`. Applies exactly the spec. Makes no
+  design calls; if it must decide something, it stops and reports instead.
+- **Verifier**: the planner (or the main loop). Runs the suite, reconciles the
+  agents, judges honestly. Never ship an executor's word for it.
+
+**Size rule.** A one-file edit, a rename, a copy tweak, a known one-liner — just
+do it. Below roughly two files or fifteen minutes the protocol costs more than
+it saves. Use it when the work spans several files, has a seam between parts, or
+will be handed to more than one agent.
+
+### What a spec must contain
+
+An executor cannot infer. A spec that omits any of these produces confident
+wrong work:
+
+- The **exact files** it owns, and an explicit "touch nothing else".
+- The **change per file**, concrete enough to apply without judgement.
+- **Why**, in one line — an executor that understands intent recovers from small
+  surprises instead of guessing.
+- The **verification command** and what passing looks like.
+- A **stop condition**: what to do when reality contradicts the spec (report,
+  do not improvise).
+- **Decisions already made**, so they are not silently re-litigated.
+
+### Parallelism
+
+- Split by **disjoint file sets**. Two agents in one file corrupt each other.
+- Every seam between two agents' files belongs to a **named owner** — usually
+  the verifier. Unowned seams are where the defects land.
+- Prefer pipelines over barriers (see Fleet size above).
+
+### Effort tiers
+
+- **State `effort` on every agent call, the same way as `model`.** Executors
+  `low`, finders and reviewers `medium`, only a final judge `high`. Omitting it
+  inherits the session effort — the same silent escalation as omitting `model`,
+  and the two compound.
+- Default **medium**; **high** for genuinely hard reasoning or a final judge.
+- **Never auto-select `xhigh` or `max`.** Ask first, and say what specifically
+  needs it and what it costs. "It is important" is not a reason; "three
+  independent verifiers disagree and the wrong call ships a payment bug" is.
+- Effort is not a substitute for a better prompt. Cheap and specific beats
+  expensive and vague.
+
+### Edge cases, all observed in real runs
+
+- **Executors skip the build**, reasoning that concurrent edits make it
+  meaningless. That reasoning is wrong: the build is what catches cross-file
+  collisions. Executors self-check syntax only; the **verifier** runs lint,
+  types, tests and build once, after collecting everyone.
+- **An agent reports success on inert work.** It changed the constant and not
+  the caller, so the feature does nothing. Specs must name the **end-to-end
+  behaviour** to prove, never the unit.
+- **A red test handed back as a finding.** If a change makes an assertion false,
+  the spec says which tests change and why. Red is not a handoff.
+- **Shared literals drift.** The same number lived in two files and they moved
+  apart silently. When a spec touches a constant, grep for its siblings and put
+  the value in one place.
+- **The probe does not discriminate.** A verification that would pass on broken
+  code proves nothing — check a known-negative control before believing a green.
+- **Stale dev-server output.** CSS and bundle claims must be verified against a
+  production build; a dev server serves stale assets and will lie.
+- **Relaying an agent's claim as fact.** Load-bearing claims get verified
+  first-hand before they reach me or the code. Being wrong twice costs more than
+  the check.
+- **Raw file dumps in the transcript.** Ask for `file:line` and findings. Long
+  output goes to a file or the scratchpad.
+
+# Agency
+
+The agency brain lives at `/Volumes/Work/agency`. Start there — `AGENTS.md` is its index.
+
+Read it when the work is agency work: clients, pricing, positioning, sales material, our own SaaS
+products, or anything commercial. That is a question about the task, not the directory — writing a
+case study for say4real is agency work even though the repo is personal, and revnest work never is.
+
+Pull it on demand. Do not preload it into unrelated sessions, and never read `brain/research/**`
+whole — grep it.
 
 # Revnest Frontend Specific Guidelines Start -
 

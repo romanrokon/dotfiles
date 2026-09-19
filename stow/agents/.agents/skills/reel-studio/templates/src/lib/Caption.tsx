@@ -9,7 +9,9 @@ import { band, clamp, outExpo, p } from './ease';
 interface Props {
    schedule: CaptionCue[];
    fontFamily: string;
-   // Distance from the frame bottom, in px of the composition.
+   // Distance from the frame bottom, in px of the composition. The default
+   // sits the caption just under the device AND above Instagram's caption /
+   // action band (~the bottom 16%), which eats anything lower.
    bottom?: number;
    ink?: string;
    // Seconds after which the last cue fades (omit = hold to the end).
@@ -17,7 +19,7 @@ interface Props {
 }
 
 export function Caption(props: Props) {
-   const { schedule, fontFamily, bottom = 118, ink = '#fff', outAt } = props;
+   const { schedule, fontFamily, bottom = 310, ink = '#fff', outAt } = props;
    const frame = useCurrentFrame();
    const { fps, width } = useVideoConfig();
    const t = frame / fps;

@@ -24,9 +24,9 @@ const FREEZE_MIN_S = 1.8;
 const FIRST_FRAME_LUMA_FLOOR = 12;      // 0..255 mean; below this the thumbnail is a void
 const FIRST_FRAME_EDGE_FLOOR = 1.5;     // mean |dx| over the frame; a flat wash scores ~0
 const SAFE_TOP = 0.08;                  // IG username / audio chip band
-const SAFE_BOTTOM = 0.14;               // IG caption / actions band
+const SAFE_BOTTOM = 0.16;               // IG caption / actions band
 const SAFE_EDGE_THRESHOLD = 48;         // |dx| that counts as a text-like edge
-const SAFE_EDGE_DENSITY = 0.035;        // fraction of band pixels over threshold → WARN
+const SAFE_EDGE_DENSITY = 0.012;        // fraction of band pixels over threshold → WARN
 const SAMPLE_EVERY_S = 0.5;
 const SAMPLE_W = 270;                   // analysis resolution; geometry is ratio-based so this is plenty
 

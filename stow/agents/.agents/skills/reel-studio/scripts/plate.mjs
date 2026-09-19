@@ -131,7 +131,7 @@ async function main() {
    await sleep(SETTLE_MS);
 
    const hideSerialised = serialiseHide(spec.hide);
-   const forbidSerialised = serialiseHide(spec.forbidOnLastFrame);
+   const forbidSerialised = serialiseForbid(spec.forbidOnLastFrame);
 
    await page.evaluate(stripPage, hideSerialised);
 
@@ -282,8 +282,8 @@ async function installSession(b) {
    });
 }
 
-// hide / forbidOnLastFrame entries: CSS selector strings, RegExp objects, or
-// '/pattern/flags' strings. Serialised so they survive the trip into the page.
+// hide entries: CSS selector strings, RegExp objects, or '/pattern/flags'
+// strings. Serialised so they survive the trip into the page.
 function serialiseHide(list) {
    return list.map(entry => {
       if (entry instanceof RegExp) return { re: entry.source, flags: entry.flags };
@@ -337,9 +337,27 @@ function stripPage(entries) {
 }
 
 // Runs in the page. Returns the first forbidden entry visible in body text.
+// forbidOnLastFrame entries are TEXT the frame must not contain — a plain
+// string is matched literally (case-insensitive), never parsed as a selector.
+function serialiseForbid(list) {
+   return list.map(entry => {
+      if (entry instanceof RegExp) return { re: entry.source, flags: entry.flags };
+
+      const m = typeof entry === 'string' && entry.match(/^\/(.+)\/([a-z]*)$/);
+
+      if (m) return { re: m[1], flags: m[2] };
+
+      return { text: String(entry) };
+   });
+}
+
 function findForbidden(entries) {
    const text = document.body.innerText || '';
    for (const e of entries) {
+      if (e.text) {
+         if (text.toLowerCase().includes(e.text.toLowerCase())) return e.text;
+         continue;
+      }
       if (e.sel) {
          const el = document.querySelector(e.sel);
          if (el && el.getClientRects().length > 0) return e.sel;
