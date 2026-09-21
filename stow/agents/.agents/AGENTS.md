@@ -520,3 +520,24 @@ While following everything from above, revnest frontend must respect these rules
 #### Never specify heading elements color explicitly, unless asked to do, ignore heading colors from screenshots too
 
 # Revnest Frontend Specific Guidelines End -
+
+# Memory & compaction
+
+Autocompact is ON. Two layers survive it, and they are the reason a compaction is cheap
+rather than lossy:
+
+- `~/.claude/memory/` — shared core, injected into every project by the SessionStart hook.
+  Identity, standing rules, Rokiron canon. Files with `always: true` in frontmatter are
+  injected in full; the rest are index lines to read on demand.
+- `~/.claude/projects/<project>/memory/` — project-specific state, loaded per project.
+
+**Write policy.** Write a memory when the user makes a decision, corrects me, or states a
+constraint — at the moment it happens, not at the end of the session. Those are the things
+that are expensive to lose and cheap to record. Do not write facts the repo already holds
+(code structure, git history, anything in `brain/` or a `PROJECT.md`); point at the file
+instead. Never write a secret, token or env VALUE into memory — names only.
+
+**Context discipline.** Context is not storage; disk is. Anything that must survive goes in
+a file before it is needed again. Prefer `/clear` when switching to unrelated work over
+letting one session carry dead weight — a turn at 950k context costs roughly 5x the same
+turn at 200k.
