@@ -531,6 +531,12 @@ rather than lossy:
   injected in full; the rest are index lines to read on demand.
 - `~/.claude/projects/<project>/memory/` — project-specific state, loaded per project.
 
+**Neither memory directory is tracked in the dotfiles repo, and neither should be.** That repo
+is PUBLIC, and these files hold personal profile and business canon. They are also the one
+layer that legitimately grows per project. So the hooks ship in the repo and their data does
+not: a fresh machine gets a working `memory-inject.py` reading an empty directory, which is the
+intended trade. Back the memory up somewhere private instead — never by adding it here.
+
 **Write policy.** Write a memory when the user makes a decision, corrects me, or states a
 constraint — at the moment it happens, not at the end of the session. Those are the things
 that are expensive to lose and cheap to record. Do not write facts the repo already holds
